@@ -12,8 +12,8 @@ class AuthViewModel : ViewModel() {
     var mensaje = mutableStateOf("")
     var usuarioActual = mutableStateOf<String?>(null)
 
-    fun registrar(nombre: String, email: String, password: String) {
-        val nuevo = Usuario(nombre, email, password)
+    fun registrar(nombre: String, apellido: String, rut: String, region: String, comuna: String, direccion: String, email: String, password: String, telefono: String) {
+        val nuevo = Usuario(nombre,apellido, rut, region, comuna, direccion, email, password, telefono)
         if (FakeDatabase.registrar(nuevo)) {
             mensaje.value = "Registro exitoso ✅"
         } else {
