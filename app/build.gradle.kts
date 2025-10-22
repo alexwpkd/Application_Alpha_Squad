@@ -18,6 +18,14 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.5.1'
+    }
+}
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -49,6 +57,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+
+// Gson (parsing JSON)
+implementation("com.google.code.gson:gson:2.9.0")
+// Coil - carga de imágenes en Compose (opcional si usas URLs)
+implementation("io.coil-kt:coil-compose:2.3.0")
+
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
