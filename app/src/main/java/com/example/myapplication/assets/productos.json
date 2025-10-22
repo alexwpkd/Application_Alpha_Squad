@@ -9,7 +9,7 @@
       "precio": 114500,
       "enStock": true,
       "stock": 8,
-      "imagenClave": "products/product-img-1",
+      "imagenClave": "product_img_1",
       "descripcion": "Fusil AEG CORE C03 half tan."
     },
     {
@@ -21,7 +21,7 @@
       "precio": 909990,
       "enStock": true,
       "stock": 5,
-      "imagenClave": "products/product-img-2",
+      "imagenClave": "product_img_2",
       "descripcion": "Subfusil compacto edición Alpine."
     },
     {
@@ -33,7 +33,7 @@
       "precio": 649990,
       "enStock": true,
       "stock": 4,
-      "imagenClave": "products/product-img-3",
+      "imagenClave": "product_img_3",
       "descripcion": "KRISS VECTOR con sistema GBB."
     },
     {
@@ -45,7 +45,7 @@
       "precio": 156000,
       "enStock": true,
       "stock": 6,
-      "imagenClave": "products/product-img-4",
+      "imagenClave": "product_img_4",
       "descripcion": "Fusil CORE C19 half tan."
     },
     {
@@ -57,7 +57,7 @@
       "precio": 159900,
       "enStock": true,
       "stock": 9,
-      "imagenClave": "products/product-img-5",
+      "imagenClave": "product_img_5",
       "descripcion": "Fusil CORE C13, gran relación precio/rendimiento."
     },
     {
@@ -69,7 +69,7 @@
       "precio": 399900,
       "enStock": true,
       "stock": 3,
-      "imagenClave": "products/product-img-6",
+      "imagenClave": "product_img_6",
       "descripcion": "AR15 AEG estilo F-1, ideal CQB."
     },
     {
@@ -81,7 +81,7 @@
       "precio": 260000,
       "enStock": true,
       "stock": 10,
-      "imagenClave": "products/product-img-7",
+      "imagenClave": "product_img_7",
       "descripcion": "Pistola GBB de alto desempeño."
     },
     {
@@ -93,7 +93,7 @@
       "precio": 220000,
       "enStock": true,
       "stock": 12,
-      "imagenClave": "products/product-img-8",
+      "imagenClave": "product_img_8",
       "descripcion": "Clásica G17 con blowback."
     },
     {
@@ -105,7 +105,7 @@
       "precio": 210000,
       "enStock": true,
       "stock": 7,
-      "imagenClave": "products/product-img-9",
+      "imagenClave": "product_img_9",
       "descripcion": "M9 full metal con buen retroceso."
     },
     {
@@ -117,7 +117,7 @@
       "precio": 18000,
       "enStock": true,
       "stock": 50,
-      "imagenClave": "products/product-img-10",
+      "imagenClave": "product_img_10",
       "descripcion": "0.25g para estabilidad media distancia."
     },
     {
@@ -129,7 +129,7 @@
       "precio": 8000,
       "enStock": true,
       "stock": 60,
-      "imagenClave": "products/product-img-11",
+      "imagenClave": "product_img_11",
       "descripcion": "Cápsulas estándar para CO2."
     },
     {
@@ -141,7 +141,7 @@
       "precio": 35000,
       "enStock": true,
       "stock": 15,
-      "imagenClave": "products/product-img-12",
+      "imagenClave": "product_img_12",
       "descripcion": "Óptica tipo red dot 1x."
     },
     {
@@ -153,7 +153,7 @@
       "precio": 15000,
       "enStock": true,
       "stock": 25,
-      "imagenClave": "products/product-img-13",
+      "imagenClave": "product_img_13",
       "descripcion": "Mejora el control; montaje M-LOK."
     },
     {
@@ -165,7 +165,7 @@
       "precio": 17000,
       "enStock": true,
       "stock": 30,
-      "imagenClave": "products/product-img-14",
+      "imagenClave": "product_img_14",
       "descripcion": "Correa ajustable de dos puntos."
     },
     {
@@ -177,7 +177,7 @@
       "precio": 28000,
       "enStock": true,
       "stock": 18,
-      "imagenClave": "products/product-img-15",
+      "imagenClave": "product_img_15",
       "descripcion": "800 lúmenes; incluye montura."
     }
   ]

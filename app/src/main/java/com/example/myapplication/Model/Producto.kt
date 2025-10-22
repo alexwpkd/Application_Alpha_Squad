@@ -1,6 +1,6 @@
 package com.example.myapplication.Model
 
-class Producto {
+data class Producto(
     val id: Int,
     val sku: String,
     val nombre: String,
@@ -9,6 +9,7 @@ class Producto {
     val precio: Int,
     val enStock: Boolean,
     val stock: Int,
-    //val imagen: String,
+    val imagenClave: String,
     val descripcion: String
-}
+)
+
