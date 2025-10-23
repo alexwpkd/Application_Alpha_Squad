@@ -42,8 +42,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.ui.CatalogoScreen
-import com.example.myapplication.ui.DetalleProductoScreen
+import com.example.myapplication.ui2.CatalogoScreen
+import com.example.myapplication.ui2.DetalleProductoScreen
 import com.example.myapplication.ViewModel.CatalogoViewModel
 
 class MainActivity : ComponentActivity() {
@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                 composable("detalle/{productoId}") { backStack ->
                     val idStr = backStack.arguments?.getString("productoId")
                     val id = idStr?.toIntOrNull() ?: -1
-                    DetalleProductoScreen(productoId = id, viewModel = viewModel)
+                    DetalleProductoScreen(productoId = id, ViewModel = viewModel)
                 }
             }
         }
