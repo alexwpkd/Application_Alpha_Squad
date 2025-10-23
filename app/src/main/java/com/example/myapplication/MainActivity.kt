@@ -1,5 +1,5 @@
 package com.example.myapplication
-
+/*
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,6 +27,40 @@ class MainActivity : ComponentActivity() {
                 composable("home/{email}") { backStack ->
                     val email = backStack.arguments?.getString("email")
                     HomeScreen(email)
+                }
+            }
+        }
+    }
+}
+*/
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.ui.CatalogoScreen
+import com.example.myapplication.ui.DetalleProductoScreen
+import com.example.myapplication.ViewModel.CatalogoViewModel
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val navController = rememberNavController()
+            val viewModel = remember { CatalogoViewModel() }
+
+            NavHost(navController = navController, startDestination = "catalogo") {
+                composable("catalogo") {
+                    CatalogoScreen(navController = navController, viewModel = viewModel)
+                }
+                composable("detalle/{productoId}") { backStack ->
+                    val idStr = backStack.arguments?.getString("productoId")
+                    val id = idStr?.toIntOrNull() ?: -1
+                    DetalleProductoScreen(productoId = id, viewModel = viewModel)
                 }
             }
         }
