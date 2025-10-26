@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
             val viewModel: AuthViewModel = viewModel()
             val catalogViewModel = CatalogoViewModel()
 
-            NavHost(navController, startDestination = "home/{email}") {
+            NavHost(navController, startDestination = "admin") {
 
                 composable("register") {
                     RegisterScreen(navController, viewModel)
@@ -38,6 +38,18 @@ class MainActivity : ComponentActivity() {
 
                 composable("catalogue") {
                     CatalogoScreen(navController, catalogViewModel)
+                }
+
+                composable("admin") {
+                    administrador(navController)
+                }
+
+                composable("adminCatalogue") {
+                    administradorCatalogo(navController)
+                }
+
+                composable("adminProductAdd") {
+                    administradorAgregarProducto(navController)
                 }
             }
         }

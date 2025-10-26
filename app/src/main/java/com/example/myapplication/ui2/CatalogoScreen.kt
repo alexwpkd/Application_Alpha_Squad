@@ -56,7 +56,6 @@ fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewM
                 }
                 //return@Box
             }else {
-
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(8.dp),
@@ -69,7 +68,6 @@ fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewM
                     }
                 }
             }
-
         }
     }
 }
