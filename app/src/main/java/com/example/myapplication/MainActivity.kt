@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
             val viewModel: AuthViewModel = viewModel()
-            val catalogViewModel : CatalogoViewModel = CatalogoViewModel()
+            val catalogViewModel = CatalogoViewModel()
 
             NavHost(navController, startDestination = "home/{email}") {
 
