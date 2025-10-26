@@ -1,5 +1,6 @@
 package com.example.myapplication.ui2
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -21,10 +22,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.ui.theme.*
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.Model.Producto
 import com.example.myapplication.ViewModel.CatalogoViewModel
+import java.util.Locale
+import kotlin.text.toInt
+
 //import kotlinx.coroutines.flow.collectAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,9 +45,10 @@ fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewM
     }
 
     Scaffold(topBar = {
-        TopAppBar(
-            title = { Text("Catalogo") },
-            colors = TopAppBarDefaults.topAppBarColors()
+        CenterAlignedTopAppBar(
+            title = { Text("Bienvenido a Alpha Squad") },
+            //colors = TopAppBarDefaults.topAppBarColors()
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
         )
 
         TextButton(onClick = { navController.navigate("home/{email}") }) {
@@ -56,6 +62,7 @@ fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewM
                 }
                 //return@Box
             }else {
+
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(8.dp),
@@ -68,30 +75,44 @@ fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewM
                     }
                 }
             }
+
         }
     }
 }
-
+@SuppressLint("DefaultLocale")
 @Composable
 fun ProductoCard(producto: Producto, onClick: () -> Unit) {
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .clickable { onClick() }
-        .padding(4.dp),
+    val context = LocalContext.current
+    val imageResId = remember(producto.imagenClave) {
+        context.resources.getIdentifier(producto.imagenClave, "drawable", context.packageName)
+    }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = ProductCard_Color)
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            val painter = rememberAsyncImagePainter(producto.imagenClave)
-            Image(painter = painter, contentDescription = producto.nombre, modifier = Modifier.size(80.dp), contentScale = ContentScale.Crop)
-            Spacer(modifier = Modifier.width(12.dp))
+        Row(
+            Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(imageResId),
+                contentDescription = producto.nombre,
+                modifier = Modifier.size(80.dp),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(text = producto.nombre, style = MaterialTheme.typography.titleMedium)
-                Text(text = "$${producto.precio}", style = MaterialTheme.typography.bodyMedium)
-
+                Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = "Precio: $${String.format(Locale("es", "CL"), "%,d", producto.precio.toInt())}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
                 producto.descripcion?.let {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = it, style = MaterialTheme.typography.bodySmall, maxLines = 2)
+                    Text(it, style = MaterialTheme.typography.bodySmall, maxLines = 2)
                 }
             }
         }

@@ -28,7 +28,6 @@ class CatalogoViewModel(
         }
     }
 
-    fun buscarProductoPorId(id: Int): Producto? {
-        return _productos.value.find { it.id == id }
-    }
+    fun buscarProductoPorId(id: Int): Producto? =
+        _productos.value.find { it.id == id }
 }
