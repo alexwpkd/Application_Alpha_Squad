@@ -29,14 +29,14 @@ import com.example.myapplication.ViewModel.CatalogoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CatalogoScreen(navController: NavController, viewModel: CatalogoViewModel) {
+fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewModel) {
     val context = LocalContext.current
-    val producto by viewModel.productos.collectAsState()
-    val loading by viewModel.loading.collectAsState()
+    val producto by catalogViewModel.productos.collectAsState()
+    val loading by catalogViewModel.loading.collectAsState()
 
     // Cargar productos (solo una vez)
     LaunchedEffect(Unit) {
-        viewModel.cargarProductos(context)
+        catalogViewModel.cargarProductos(context)
     }
 
     Scaffold(topBar = {
@@ -44,6 +44,10 @@ fun CatalogoScreen(navController: NavController, viewModel: CatalogoViewModel) {
             title = { Text("Catalogo") },
             colors = TopAppBarDefaults.topAppBarColors()
         )
+
+        TextButton(onClick = { navController.navigate("home/{email}") }) {
+            Text("Volver")
+        }
     }) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             if (loading) {

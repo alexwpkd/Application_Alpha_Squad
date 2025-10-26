@@ -12,4 +12,3 @@ data class Producto(
     val imagenClave: String,
     val descripcion: String
 )
-
