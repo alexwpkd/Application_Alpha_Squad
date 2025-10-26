@@ -31,7 +31,7 @@ import java.util.Locale
 import kotlin.text.toInt
 
 //import kotlinx.coroutines.flow.collectAsState
-
+import androidx.compose.ui.res.painterResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewModel) {
@@ -82,10 +82,12 @@ fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewM
 @SuppressLint("DefaultLocale")
 @Composable
 fun ProductoCard(producto: Producto, onClick: () -> Unit) {
+    /*
     val context = LocalContext.current
     val imageResId = remember(producto.imagenClave) {
         context.resources.getIdentifier(producto.imagenClave, "drawable", context.packageName)
     }
+     */
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,7 +101,8 @@ fun ProductoCard(producto: Producto, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = rememberAsyncImagePainter(imageResId),
+                //painter = rememberAsyncImagePainter(imageResId),
+                painter = painterResource(id = producto.imagenClave),
                 contentDescription = producto.nombre,
                 modifier = Modifier.size(80.dp),
                 contentScale = ContentScale.Crop

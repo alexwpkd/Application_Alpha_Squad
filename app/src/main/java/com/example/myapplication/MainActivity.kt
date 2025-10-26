@@ -8,10 +8,7 @@ import com.example.myapplication.ViewModel.AuthViewModel
 import com.example.myapplication.View.*
 import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ui2.CatalogoScreen
-
-
 //
-
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,6 +17,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ui.theme.MyApplicationTheme
+//
+import androidx.navigation.NavType
+import com.example.myapplication.ui2.DetalleProductoScreen
+import androidx.navigation.navArgument
 
 
 class MainActivity : ComponentActivity() {
@@ -70,6 +71,15 @@ class MainActivity : ComponentActivity() {
                         composable("adminProductAdd") {
                             administradorAgregarProducto(navController)
                         }
+                        composable(
+                            route = "detalle/{productoId}",
+                            arguments = listOf(navArgument("productoId") { type = NavType.IntType })
+                        ) { backStackEntry ->
+                            val id = backStackEntry.arguments?.getInt("productoId") ?: -1
+                            // Usa argumento posicional o el nombre exacto del parámetro que tenga tu función
+                            DetalleProductoScreen(productoId = id, viewModel = catalogViewModel, navController = navController)
+                        }
+
                     }
                 }
             }

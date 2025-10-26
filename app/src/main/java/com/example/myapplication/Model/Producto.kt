@@ -9,6 +9,6 @@ data class Producto(
     val precio: Int,
     val enStock: Boolean,
     val stock: Int,
-    val imagenClave: String,
+    val imagenClave: Int,
     val descripcion: String
 )
