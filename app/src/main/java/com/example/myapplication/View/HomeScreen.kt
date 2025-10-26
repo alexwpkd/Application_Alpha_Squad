@@ -44,7 +44,7 @@ fun HomeScreen(
                 Text("Entrar a catalogo")
             }
 
-            TextButton(onClick = { navController.navigate("admin") }) {
+            TextButton(onClick = { navController.navigate("login") }) {
                 Text("Entrar a admin")
             }
         }

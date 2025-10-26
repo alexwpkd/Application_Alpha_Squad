@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.ViewModel.AuthViewModel
 
 @Composable
@@ -27,17 +28,29 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(onClick = {
-            if (viewModel.login(email, password)) {
-                navController.navigate("home/$email")
+            val resultado = viewModel.login(email, password, navController)
+
+            when {
+                viewModel.mensaje.value.contains("Administrador") -> {
+                    navController.navigate("admin")
+                }
+                resultado -> {
+                    navController.navigate("admin")
+                }
             }
         }) {
             Text("Entrar")
         }
 
+
         Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 10.dp))
 
         TextButton(onClick = { navController.navigate("register") }) {
             Text("¿No tienes cuenta? Registrate!")
+        }
+
+        TextButton(onClick = { navController.navigate("home/$email") }) {
+            Text("volver")
         }
     }
 }

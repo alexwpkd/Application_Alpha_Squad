@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.myapplication"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.myapplication"
@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
     debugImplementation(libs.androidx.ui.tooling)
 
     // Navigation Compose

@@ -11,6 +11,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
+import com.example.myapplication.ui.theme.Primary_Blue
 
 
 private val DarkColorScheme = darkColorScheme(
