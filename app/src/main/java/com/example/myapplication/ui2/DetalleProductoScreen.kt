@@ -17,9 +17,6 @@ import androidx.compose.foundation.layout.Arrangement
 
 //
 import androidx.navigation.NavController
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetalleProductoScreen(productoId: Int, viewModel: CatalogoViewModel,navController: NavController) {
@@ -44,9 +41,13 @@ fun DetalleProductoScreen(productoId: Int, viewModel: CatalogoViewModel,navContr
                 colors = TopAppBarDefaults.topAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_media_previous),
+                                    contentDescription = "Volver"
+                        )
                     }
                 }
+
             )
         }
     ) { padding ->
