@@ -3,6 +3,7 @@ package com.example.myapplication.View
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -20,6 +21,19 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             .padding(20.dp),
         verticalArrangement = Arrangement.Center
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "~ Alpha Squad ~",
+                style = MaterialTheme.typography.titleLarge,
+            )
+        }
+        Spacer(modifier = Modifier.height(40.dp))
+
         Text("Inicio de Sesión", style = MaterialTheme.typography.titleLarge)
 
         OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
@@ -50,7 +64,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         }
 
         TextButton(onClick = { navController.navigate("home/{email}") }) {
-            Text("volver")
+            Text("Entrar a home")
         }
     }
 }

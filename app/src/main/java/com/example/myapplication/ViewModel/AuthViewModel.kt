@@ -18,8 +18,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     var mensaje = mutableStateOf("")
     private val gson by lazy { GsonBuilder().setPrettyPrinting().create() }
 
-    // Valida un RUT chileno con o sin guion y sin puntos.
-     //Si no hay guion, el último carácter se toma como DV (0-9 o K/k).
     private fun validarRut(rut: String): Boolean {
         val clean = rut.replace(".", "").replace("-", "").replace(" ", "").uppercase()
         if (clean.length < 2) return false
@@ -45,8 +43,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         return dvIngresado == dvCalculado
     }
 
-
-    /** Devuelve el RUT formateado como 12.345.678-5. Si no se puede, retorna el original. */
     private fun formatearRut(rut: String): String {
         val clean = rut.replace(".", "").replace("-", "").replace(" ", "").uppercase()
         if (clean.length < 2) return rut
@@ -68,13 +64,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private fun validarEmail(email: String): Boolean =
         Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
-    /** Contraseña: mín. 4 caracteres, 1 mayúscula, 1 minúscula */
     private fun validarPassword(password: String): Boolean =
         password.length >= 4 &&
                 password.any { it.isUpperCase() } &&
                 password.any { it.isLowerCase() }
 
-    /** Devuelve mensaje concreto según qué falta */
     private fun passwordError(password: String): String? {
         val faltas = mutableListOf<String>()
         if (password.length < 4) faltas += "mín. 4 caracteres"
@@ -92,10 +86,9 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         return dir
     }
 
-    /** Devuelve el archivo usuario.json; si no existe lo crea con [] */
     private fun usuariosFile(): File {
         val file = File(usuariosDir(), "usuario.json")
-        if (!file.exists()) file.writeText("[]") // lista vacía inicial
+        if (!file.exists()) file.writeText("[]")
         return file
     }
 
@@ -111,13 +104,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /** Sobrescribe el archivo con la lista recibida */
     private fun guardarUsuariosAArchivo(usuarios: List<Usuario>) {
         val file = usuariosFile()
         file.writeText(gson.toJson(usuarios))
     }
 
-    /** Agrega o actualiza un usuario (evita duplicados por email o rut) */
     private fun agregarUsuarioAlJson(usuario: Usuario) {
         val lista = cargarUsuariosDesdeArchivo()
         val idx = lista.indexOfFirst {
@@ -145,12 +136,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     )
 
     {
-        // ---------- Validaciones de campos ----------
         val nombreTrim = nombre.trim()
         val rutTrim = rut.trim()
         val direccionTrim = direccion.trim()
         val emailTrim = email.trim()
-        val passwordRaw = password // por si luego quieres más reglas
+        val passwordRaw = password
 
         if (!noVacio(nombreTrim)) {
             mensaje.value = "El nombre es obligatorio"
@@ -240,7 +230,5 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         val adminPassword = adminData.getString("password")
 
         return email == adminEmail && password == adminPassword
-        //alex, si ves esto, me dio flojera hacer esto con otro json util, con una lista
-        //y todo el tema, a si que espero que con un puro admin baste, por eso use JSONObject
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Login
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Storefront
@@ -27,7 +28,7 @@ fun HomeScreen(
     var welcome by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        delay(2000)
+        delay(1200)
         welcome = false
     }
 
@@ -53,7 +54,7 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Has iniciado sesión como:\n$email",
+                        text = "Cargando...",
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center
                     )
@@ -114,8 +115,8 @@ fun HomeScreen(
                     )
 
                     HomeButton(
-                        text = "Login",
-                        icon = Icons.Default.Login,
+                        text = "Sign Out",
+                        icon = Icons.Default.ExitToApp,
                         color = MaterialTheme.colorScheme.tertiaryContainer
                     ) {
                         navController.navigate("login")

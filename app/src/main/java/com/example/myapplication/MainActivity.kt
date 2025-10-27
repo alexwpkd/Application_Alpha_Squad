@@ -31,7 +31,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -43,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     val carritoViewModel: CarritoViewModel = viewModel()
 
 
-                    NavHost(navController, startDestination = "admin") {
+                    NavHost(navController, startDestination = "login") {
 
                         composable("register") {
                             RegisterScreen(navController, viewModel)
@@ -82,7 +81,6 @@ class MainActivity : ComponentActivity() {
                             arguments = listOf(navArgument("productoId") { type = NavType.IntType })
                         ) { backStackEntry ->
                             val id = backStackEntry.arguments?.getInt("productoId") ?: -1
-                            // Usa argumento posicional o el nombre exacto del parámetro que tenga tu función
                             DetalleProductoScreen(productoId = id, viewModel = catalogoViewModel, carritoViewModel = carritoViewModel, navController = navController)
 
                             DetalleProductoScreen(

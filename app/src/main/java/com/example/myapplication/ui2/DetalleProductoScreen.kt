@@ -17,6 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ViewModel.CarritoViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +29,9 @@ fun DetalleProductoScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         if (viewModel.productos.value.isEmpty()) {
@@ -54,7 +59,12 @@ fun DetalleProductoScreen(
                 }
 
             )
+        },
+
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
+
     ) { padding ->
         producto?.let { p ->
             Column(
@@ -79,7 +89,9 @@ fun DetalleProductoScreen(
                 Button(
                     onClick = {
                         carritoViewModel.agregarAlCarrito(p)
-                        navController.navigate("carrito")
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Producto agregado")
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -87,10 +99,10 @@ fun DetalleProductoScreen(
                 }
 
                 OutlinedButton(
-                    onClick = { navController.navigate("catalogue") },
+                    onClick = { navController.navigate("carrito") },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Regresar a la tienda")
+                    Text("Ir a carrito de compras")
                 }
             }
         } ?: Box(

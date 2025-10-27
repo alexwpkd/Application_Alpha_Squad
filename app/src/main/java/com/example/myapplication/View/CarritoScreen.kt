@@ -51,6 +51,10 @@ fun CarritoScreen(
                 Text("Volver")
             }
 
+            TextButton(onClick = { navController.navigate("catalogue") }) {
+                Text("Ir a catalogo")
+            }
+
             if (productos.isEmpty()) {
                 Text("El carrito está vacío")
             } else {
@@ -72,7 +76,6 @@ fun CarritoScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            // BOTÓN “COMPRAR” con validación y deshabilitado si no hay productos
             Button(
                 onClick = {
                     scope.launch {
@@ -81,7 +84,7 @@ fun CarritoScreen(
                         } else {
                             val ok = carritoViewModel.realizarCompra()
                             if (ok) {
-                                snackbarHostState.showSnackbar("Compra realizada con éxito")
+                                snackbarHostState.showSnackbar("Compra realizada con exito")
                             } else {
                                 snackbarHostState.showSnackbar("ERROR: No se pudo realizar la compra")
                             }
@@ -92,6 +95,21 @@ fun CarritoScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Comprar")
+            }
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        val ok = carritoViewModel.realizarCompra()
+                        if (ok) {
+                            snackbarHostState.showSnackbar("Carrito eliminado")
+                        }
+                    }
+                },
+                enabled = productos.isNotEmpty(),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Eliminar carrito")
             }
 
         }
