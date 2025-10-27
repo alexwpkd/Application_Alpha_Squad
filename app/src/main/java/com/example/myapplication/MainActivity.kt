@@ -21,6 +21,7 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.navigation.NavType
 import com.example.myapplication.ui2.DetalleProductoScreen
 import androidx.navigation.navArgument
+import com.example.myapplication.ViewModel.CarritoViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -35,7 +36,11 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     val viewModel: AuthViewModel = viewModel()
+
                     val catalogoViewModel: CatalogoViewModel = viewModel()
+
+                    val catalogViewModel = CatalogoViewModel()
+                    val carritoViewModel: CarritoViewModel = viewModel()
 
 
                     NavHost(navController, startDestination = "admin") {
@@ -53,12 +58,14 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(navController, email)
                         }
 
-                        composable("cart") {
-                            CarritoScreen(navController)
+                        composable("carrito") {
+                            CarritoScreen(navController, carritoViewModel)
                         }
 
                         composable("catalogue") {
+
                             CatalogoScreen(navController, catalogoViewModel)
+                            CatalogoScreen(navController, catalogViewModel, carritoViewModel)
                         }
 
                         composable("admin") {
@@ -79,8 +86,14 @@ class MainActivity : ComponentActivity() {
                             val id = backStackEntry.arguments?.getInt("productoId") ?: -1
                             // Usa argumento posicional o el nombre exacto del parámetro que tenga tu función
                             DetalleProductoScreen(productoId = id, viewModel = catalogoViewModel, navController = navController)
-                        }
 
+                            DetalleProductoScreen(
+                                productoId = id,
+                                viewModel = catalogViewModel,
+                                carritoViewModel = carritoViewModel,
+                                navController = navController
+                            )
+                        }
                     }
                 }
             }

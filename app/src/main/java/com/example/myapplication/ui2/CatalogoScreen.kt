@@ -32,21 +32,26 @@ import kotlin.text.toInt
 
 //import kotlinx.coroutines.flow.collectAsState
 import androidx.compose.ui.res.painterResource
+import com.example.myapplication.ViewModel.CarritoViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewModel) {
+fun CatalogoScreen(
+    navController: NavController,
+    catalogViewModel: CatalogoViewModel,
+    carritoViewModel: CarritoViewModel
+) {
     val context = LocalContext.current
     val producto by catalogViewModel.productos.collectAsState()
     val loading by catalogViewModel.loading.collectAsState()
 
-    // Cargar productos (solo una vez)
     LaunchedEffect(Unit) {
         catalogViewModel.cargarProductos(context)
     }
 
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
-            title = { Text("Bienvenido a Alpha Squad") },
+            title = { Text("Catalogo de productos\nAlpha Squad") },
             //colors = TopAppBarDefaults.topAppBarColors()
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
         )
@@ -60,28 +65,29 @@ fun CatalogoScreen(navController: NavController, catalogViewModel: CatalogoViewM
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
-                //return@Box
-            }else {
-
+            } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(items = producto, key = { it.id }) { producto ->
-                        ProductoCard(producto = producto, onClick = {
-                            navController.navigate("detalle/${producto.id}")
-                        })
+                    items(producto, key = { it.id }) { producto ->
+                        ProductoCard(
+                            producto = producto,
+                            onDetalle = { navController.navigate("detalle/${producto.id}") }
+                        )
                     }
                 }
             }
-
         }
     }
 }
 @SuppressLint("DefaultLocale")
 @Composable
-fun ProductoCard(producto: Producto, onClick: () -> Unit) {
+fun ProductoCard(
+    producto: Producto,
+    onDetalle: () -> Unit
+) {
     /*
     val context = LocalContext.current
     val imageResId = remember(producto.imagenClave) {
@@ -89,9 +95,7 @@ fun ProductoCard(producto: Producto, onClick: () -> Unit) {
     }
      */
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = ProductCard_Color)
@@ -101,7 +105,6 @@ fun ProductoCard(producto: Producto, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                //painter = rememberAsyncImagePainter(imageResId),
                 painter = painterResource(id = producto.imagenClave),
                 contentDescription = producto.nombre,
                 modifier = Modifier.size(80.dp),
@@ -110,12 +113,12 @@ fun ProductoCard(producto: Producto, onClick: () -> Unit) {
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text = "Precio: $${String.format(Locale("es", "CL"), "%,d", producto.precio.toInt())}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                producto.descripcion?.let {
-                    Text(it, style = MaterialTheme.typography.bodySmall, maxLines = 2)
+                Text("Precio: $${producto.precio}", style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = onDetalle) {
+                        Text("Ver")
+                    }
                 }
             }
         }
