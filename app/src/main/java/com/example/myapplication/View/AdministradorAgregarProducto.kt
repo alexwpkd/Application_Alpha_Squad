@@ -68,7 +68,7 @@ fun administradorAgregarProducto(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Agregar Producto", fontWeight = FontWeight.Bold) },
+                title = { Text("Agregar producto", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
@@ -88,7 +88,7 @@ fun administradorAgregarProducto(
                 onClick = { navController.navigate("admin") },
                 modifier = Modifier.align(Alignment.Start)
             ) {
-                Text("← Volver")
+                Text("Volver")
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -121,7 +121,7 @@ fun administradorAgregarProducto(
 
             OutlinedTextField(
                 value = categoria, onValueChange = { categoria = it },
-                label = { Text("Categoría") },
+                label = { Text("Categoria") },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -132,7 +132,7 @@ fun administradorAgregarProducto(
                 OutlinedTextField(
                     value = selectedText,
                     onValueChange = {},
-                    label = { Text("Subcategoría") },
+                    label = { Text("Subcategoria") },
                     readOnly = true,
                     modifier = Modifier
                         .menuAnchor()
