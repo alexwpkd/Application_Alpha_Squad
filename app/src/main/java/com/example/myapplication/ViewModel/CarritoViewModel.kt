@@ -20,4 +20,14 @@ class CarritoViewModel : ViewModel() {
     fun limpiarCarrito() {
         _carrito.value = emptyList()
     }
+
+    fun realizarCompra(): Boolean {
+        return if (_carrito.value.isEmpty()) {
+            false
+        } else {
+            limpiarCarrito()
+            true
+        }
+    }
+
 }
