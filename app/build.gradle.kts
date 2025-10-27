@@ -49,6 +49,8 @@ dependencies {
     // BOM de Compose para alinear versiones
     implementation(platform(libs.androidx.compose.bom))
 
+    implementation("androidx.compose.material:material-icons-extended:1.5.0")
+
     // Core + Activity Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)

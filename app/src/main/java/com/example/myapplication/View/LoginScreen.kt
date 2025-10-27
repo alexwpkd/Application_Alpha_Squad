@@ -49,7 +49,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             Text("¿No tienes cuenta? Registrate!")
         }
 
-        TextButton(onClick = { navController.navigate("home/$email") }) {
+        TextButton(onClick = { navController.navigate("home/{email}") }) {
             Text("volver")
         }
     }

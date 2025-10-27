@@ -5,27 +5,28 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
-import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.ViewModel.CatalogoViewModel
-import androidx.compose.foundation.layout.Arrangement
-
-//
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import com.example.myapplication.ViewModel.CatalogoViewModel
+import com.example.myapplication.ViewModel.CarritoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetalleProductoScreen(productoId: Int, viewModel: CatalogoViewModel,navController: NavController) {
+fun DetalleProductoScreen(
+    productoId: Int,
+    viewModel: CatalogoViewModel,
+    carritoViewModel: CarritoViewModel,
+    navController: NavController
+) {
     val context = LocalContext.current
 
-    // Si entras directo al detalle, asegura que los productos estén cargados
     LaunchedEffect(Unit) {
         if (viewModel.productos.value.isEmpty()) {
             viewModel.cargarProductos(context)
@@ -57,8 +58,6 @@ fun DetalleProductoScreen(productoId: Int, viewModel: CatalogoViewModel,navContr
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Simplificado: Se confía en que imagenClave es un ID de drawable válido
-                // gracias a la lógica de fallback en el repositor
                 Image(
                     painter = painterResource(id = p.imagenClave),
                     contentDescription = p.nombre,
@@ -73,11 +72,15 @@ fun DetalleProductoScreen(productoId: Int, viewModel: CatalogoViewModel,navContr
                 Text(text = p.descripcion, style = MaterialTheme.typography.bodyMedium)
 
                 Button(
-                    onClick = { /* TODO: agregar al carrito */ },
+                    onClick = {
+                        carritoViewModel.agregarAlCarrito(p)
+                        navController.navigate("carrito")
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Agregar al carrito")
                 }
+
                 OutlinedButton(
                     onClick = { navController.navigate("catalogue") },
                     modifier = Modifier.fillMaxWidth()
@@ -85,12 +88,11 @@ fun DetalleProductoScreen(productoId: Int, viewModel: CatalogoViewModel,navContr
                     Text("Regresar a la tienda")
                 }
             }
+        } ?: Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Producto no encontrado")
         }
-
-    } ?: Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Producto no encontrado")
     }
 }

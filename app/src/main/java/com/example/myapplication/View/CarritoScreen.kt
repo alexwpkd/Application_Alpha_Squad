@@ -17,27 +17,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
+import com.example.myapplication.ViewModel.CarritoViewModel
 
 @Composable
 fun CarritoScreen(
-    navController: NavController
+    navController: NavController,
+    carritoViewModel: CarritoViewModel
 ) {
-    val context = LocalContext.current
-
-    var productos by remember {
-        mutableStateOf(emptyList<Producto>())
-    }
-
-    LaunchedEffect(Unit) {
-        productos = loadProducts(context)
-    }
+    val productos by carritoViewModel.carrito.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("Carrito de compras")
+        Text("Carrito de compras", style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(15.dp))
 
         TextButton(onClick = { navController.navigate("home/{email}") }) {
@@ -45,23 +39,21 @@ fun CarritoScreen(
         }
 
         if (productos.isEmpty()) {
-            Text("No hay productos disponibles por el momento")
+            Text("El carrito está vacío")
         } else {
             LazyColumn {
-                items(productos) {
-                        producto -> Card (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
-                        Text("Precio: $${producto.precio}")
-                        Text(producto.descripcion)
-                        val painter = rememberAsyncImagePainter(producto.imagenClave)
-                        Image(painter = painter, contentDescription = producto.nombre, modifier = Modifier.size(80.dp), contentScale = ContentScale.Crop)
+                items(productos) { producto ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
+                            Text("Precio: $${producto.precio}")
+                            Text(producto.descripcion ?: "")
+                        }
                     }
-                }
                 }
             }
         }
