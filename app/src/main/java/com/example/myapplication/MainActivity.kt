@@ -1,4 +1,5 @@
 package com.example.myapplication
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,6 +26,7 @@ import com.example.myapplication.ViewModel.CarritoViewModel
 
 
 class MainActivity : ComponentActivity() {
+    @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
