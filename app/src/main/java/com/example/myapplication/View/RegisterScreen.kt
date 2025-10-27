@@ -11,14 +11,14 @@ import com.example.myapplication.ViewModel.AuthViewModel
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
     var nombre by remember { mutableStateOf("") }
-    var apellido by remember { mutableStateOf("") }
+    //var apellido by remember { mutableStateOf("") }
     var rut by remember { mutableStateOf("") }
-    var region by remember { mutableStateOf("") }
-    var comuna by remember { mutableStateOf("") }
+    //var region by remember { mutableStateOf("") }
+    //var comuna by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var telefono by remember { mutableStateOf("") }
+    //var telefono by remember { mutableStateOf("") }
 
 
     Column(
@@ -30,18 +30,19 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
         Text("Registro", style = MaterialTheme.typography.titleLarge)
 
         OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
-        OutlinedTextField(value = apellido, onValueChange = { apellido = it }, label = { Text("Apellido") })
+        //OutlinedTextField(value = apellido, onValueChange = { apellido = it }, label = { Text("Apellido") })
         OutlinedTextField(value = rut, onValueChange = { rut = it }, label = { Text("Rut") })
-        OutlinedTextField(value = region, onValueChange = { region = it }, label = { Text("Region") })
-        OutlinedTextField(value = comuna, onValueChange = { comuna = it }, label = { Text("Comuna") })
+        //OutlinedTextField(value = region, onValueChange = { region = it }, label = { Text("Region") })
+        //OutlinedTextField(value = comuna, onValueChange = { comuna = it }, label = { Text("Comuna") })
         OutlinedTextField(value = direccion, onValueChange = { direccion = it }, label = { Text("Direccion") })
         OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
         OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Contraseña") })
-        OutlinedTextField(value = telefono, onValueChange = { telefono = it }, label = { Text("Telefono") })
+        //OutlinedTextField(value = telefono, onValueChange = { telefono = it }, label = { Text("Telefono") })
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Button(onClick = { viewModel.registrar(nombre, apellido, rut, region, comuna, direccion, email, password, telefono) }) {
+        //Button(onClick = { viewModel.registrar(nombre, apellido, rut, region, comuna, direccion, email, password, telefono) }) {
+        Button(onClick = { viewModel.registrar(nombre, rut, direccion, email, password) }) {
             Text("Registrar")
         }
 

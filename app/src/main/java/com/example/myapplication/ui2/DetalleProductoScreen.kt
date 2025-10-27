@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import com.example.myapplication.ViewModel.CatalogoViewModel
@@ -45,9 +46,13 @@ fun DetalleProductoScreen(
                 colors = TopAppBarDefaults.topAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                        Icon(
+                            painter = painterResource(id = android.R.drawable.ic_media_previous),
+                                    contentDescription = "Volver"
+                        )
                     }
                 }
+
             )
         }
     ) { padding ->
