@@ -38,9 +38,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     val viewModel: AuthViewModel = viewModel()
-
                     val catalogoViewModel: CatalogoViewModel = viewModel()
-
                     val catalogViewModel = CatalogoViewModel()
                     val carritoViewModel: CarritoViewModel = viewModel()
 
@@ -65,8 +63,6 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("catalogue") {
-
-                            CatalogoScreen(navController, catalogoViewModel)
                             CatalogoScreen(navController, catalogViewModel, carritoViewModel)
                         }
 
@@ -87,7 +83,7 @@ class MainActivity : ComponentActivity() {
                         ) { backStackEntry ->
                             val id = backStackEntry.arguments?.getInt("productoId") ?: -1
                             // Usa argumento posicional o el nombre exacto del parámetro que tenga tu función
-                            DetalleProductoScreen(productoId = id, viewModel = catalogoViewModel, navController = navController)
+                            DetalleProductoScreen(productoId = id, viewModel = catalogoViewModel, carritoViewModel = carritoViewModel, navController = navController)
 
                             DetalleProductoScreen(
                                 productoId = id,
