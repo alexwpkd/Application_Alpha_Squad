@@ -3,26 +3,34 @@ package com.example.myapplication
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.view.WindowCompat
+import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.ui.screens.PostScreen
-import com.example.myapplication.viewmodel.PostViewModel
+import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.ViewModel.AuthViewModel
+import com.example.myapplication.ViewModel.CatalogoViewModel
+import com.example.myapplication.ViewModel.CarritoViewModel
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Permite que la app dibuje contenido debajo de las barras del sistema
-        WindowCompat.setDecorFitsSystemWindows(window, decorFitsSystemWindows = false)
+        enableEdgeToEdge()
 
         setContent {
             MyApplicationTheme {
-                // Inyectamos el ViewModel
-                val postViewModel: PostViewModel = viewModel()
+                val navController = rememberNavController()
 
-                // Mostramos la pantalla de posts
-                PostScreen(viewModel = postViewModel)
+                // ViewModels compartidos
+                val authViewModel: AuthViewModel = viewModel()
+                val catalogoViewModel: CatalogoViewModel = viewModel()
+                val carritoViewModel: CarritoViewModel = viewModel()
+
+                AppNavHost(
+                    navController = navController,
+                    authViewModel = authViewModel,
+                    catalogoViewModel = catalogoViewModel,
+                    carritoViewModel = carritoViewModel
+                )
             }
         }
     }
