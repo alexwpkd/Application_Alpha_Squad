@@ -2,9 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permite que la app acceda a Internet (por ejemplo, para cargar imágenes o datos desde una URL)
+    <!-- Permiso necesario para hacer peticiones HTTP -->
     <uses-permission android:name="android.permission.INTERNET" />
-    -->
 
     <!-- Permite el tráfico "no seguro" (HTTP en lugar de HTTPS).
      Solo se usa si tus imágenes o servicios usan direcciones http:// en vez de https://
@@ -16,6 +15,7 @@
 
     <application
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
