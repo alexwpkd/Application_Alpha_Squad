@@ -6,7 +6,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.myapplication.View.*
+import com.example.myapplication.View.LoginScreen
+import com.example.myapplication.View.RegisterScreen
+import com.example.myapplication.View.HomeScreen
+import com.example.myapplication.View.CarritoScreen
+import com.example.myapplication.View.Administrador
+import com.example.myapplication.View.administrador
 import com.example.myapplication.ViewModel.AuthViewModel
 import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ViewModel.CarritoViewModel

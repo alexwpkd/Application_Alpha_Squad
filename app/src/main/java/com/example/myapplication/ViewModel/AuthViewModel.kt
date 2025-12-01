@@ -49,31 +49,4 @@ class AuthViewModel(
             }
         }
     }
-    fun registrar(nombre: String, rut: String, direccion: String, email: String, password: String) {
-        viewModelScope.launch {
-            _loading.value = true
-            _mensaje.value = ""
-            try {
-                // Aquí deberías llamar a la función correspondiente en tu AuthRepository
-                // Por ejemplo: val response = repo.registrarUsuario(nombre, rut, direccion, email, password)
-
-                // --- Lógica de ejemplo ---
-                // Simulo una llamada a un repositorio que aún no existe,
-                // para que puedas adaptarlo a tu AuthRepository cuando lo crees.
-                // Reemplaza esto con tu llamada real al repositorio.
-                _mensaje.value = "Registro para '$email' enviado correctamente."
-                // --- Fin de la lógica de ejemplo ---
-
-            } catch (e: HttpException) {
-                // Manejo de errores de red (ej. usuario ya existe, etc.)
-                _mensaje.value = "Error en el registro: ${e.message()}"
-            } catch (e: Exception) {
-                // Manejo de otros errores
-                _mensaje.value = "Error inesperado: ${e.localizedMessage}"
-            } finally {
-                _loading.value = false
-            }
-        }
-    }
 }
-
