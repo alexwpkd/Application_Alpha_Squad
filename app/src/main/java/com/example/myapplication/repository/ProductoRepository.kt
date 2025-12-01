@@ -1,12 +1,18 @@
 package com.example.myapplication.repository
 
 import android.content.Context
+import android.widget.Toast
 import com.example.myapplication.Model.Producto
+import com.example.myapplication.Model.ProductoDto
+import com.example.myapplication.Model.toDomain
+import com.example.myapplication.Model.toEntity
+import com.example.myapplication.local.AppDatabase
+import com.example.myapplication.remote.RetrofitClient
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.google.gson.JsonObject
 
 class ProductoRepository {
+
     private data class ProductoJson(
         val id: Int,
         val sku: String,
@@ -16,35 +22,27 @@ class ProductoRepository {
         val precio: Int,
         val enStock: Boolean,
         val stock: Int,
-        val imagenClave: String, // <-- Aquí se mantiene como String
+        val imagenClave: String,
         val descripcion: String
     )
-    /*
-    fun obtenerProductosDesdeAssets(context: Context, filename: String = "productos.json"): List<Producto> {
-        return try {
-            val json = context.assets.open(filename).bufferedReader().use { it.readText() }
-            val type = object : TypeToken<List<Producto>>() {}.type
-            Gson().fromJson(json, type)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
-    }*/
 
+    // ---------- 1) ASSETS: LO QUE YA TENÍAS ----------
     fun obtenerProductosDesdeAssets(context: Context): List<Producto> {
-        val jsonString = context.assets.open("productos.json").bufferedReader().use { it.readText() }
+        val jsonString =
+            context.assets.open("productos.json").bufferedReader().use { it.readText() }
+
         val gson = Gson()
         val listProductoType = object : TypeToken<List<ProductoJson>>() {}.type
-        val productosDesdeJson: List<ProductoJson> = gson.fromJson(jsonString, listProductoType)
+        val productosDesdeJson: List<ProductoJson> =
+            gson.fromJson(jsonString, listProductoType)
 
         return productosDesdeJson.map { pj ->
-            // Convierte el nombre del drawable a su ID Int
             val idDeImagen = context.resources.getIdentifier(
-                pj.imagenClave,        // ej: "product_img_1"
-                "drawable",            // carpeta res/drawable
+                pj.imagenClave,
+                "drawable",
                 context.packageName
             ).let { id ->
-                if (id != 0) id else android.R.drawable.ic_menu_report_image // fallback seguro
+                if (id != 0) id else android.R.drawable.ic_menu_report_image
             }
 
             Producto(
@@ -56,9 +54,34 @@ class ProductoRepository {
                 precio = pj.precio,
                 enStock = pj.enStock,
                 stock = pj.stock,
-                imagenClave = idDeImagen,  // <-- ahora es Int
+                imagenClave = idDeImagen,
                 descripcion = pj.descripcion
             )
+        }
+    }
+
+    // ---------- 2) API + ROOM ----------
+    suspend fun obtenerProductosDesdeApi(context: Context): List<Producto> {
+        val db = AppDatabase.getInstance(context)
+        val dao = db.productoDao()
+
+        val dtoList: List<ProductoDto> = RetrofitClient.apiService.getProductos()
+        val entities = dtoList.map { it.toEntity() }
+        dao.insertAll(entities)
+
+        return entities.map { it.toDomain(context) }
+    }
+
+    // ---------- 3) MÉTODO PRINCIPAL QUE USA EL VIEWMODEL ----------
+    suspend fun getProductos(context: Context): List<Producto> {
+        return try {
+            val listaApi = obtenerProductosDesdeApi(context)
+            Toast.makeText(context, "Productos desde API", Toast.LENGTH_SHORT).show()
+            listaApi
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, "Productos desde ASSETS", Toast.LENGTH_SHORT).show()
+            obtenerProductosDesdeAssets(context)
         }
     }
 }
