@@ -1,23 +1,26 @@
 package com.example.myapplication.View
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Login
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.myapplication.R
 import kotlinx.coroutines.delay
 
 @Composable
@@ -37,6 +40,7 @@ fun HomeScreen(
         color = MaterialTheme.colorScheme.background
     ) {
         if (welcome) {
+            // --- Pantalla de Carga Inicial (sin cambios) ---
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -45,6 +49,12 @@ fun HomeScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "Logo de Alpha Squad",
+                        modifier = Modifier.size(150.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "~ Alpha Squad ~",
                         style = MaterialTheme.typography.headlineLarge.copy(
@@ -61,17 +71,29 @@ fun HomeScreen(
                 }
             }
         } else {
+            // --- Pantalla del Menú Principal (MODIFICADA) ---
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(20.dp)
             ) {
+                // El contenido principal ahora está en un solo Column centrado
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .align(Alignment.Center), // Alinea toda la columna en el centro
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center // Centra los elementos verticalmente dentro del espacio que ocupan
                 ) {
+                    // 1. Logo (más grande)
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "Logo de Alpha Squad",
+                        modifier = Modifier.size(170.dp) // Aumentamos el tamaño
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // 2. Título
                     Text(
                         text = "Menú Principal",
                         style = MaterialTheme.typography.headlineMedium.copy(
@@ -79,9 +101,9 @@ fun HomeScreen(
                         ),
                         color = MaterialTheme.colorScheme.primary
                     )
-
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    // 3. Botones de acción
                     HomeButton(
                         text = "Catalogo",
                         icon = Icons.Default.Storefront,
@@ -101,6 +123,7 @@ fun HomeScreen(
                     }
                 }
 
+                // Botón de Sign Out (se mantiene abajo)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()

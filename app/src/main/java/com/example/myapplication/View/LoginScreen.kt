@@ -1,13 +1,18 @@
 package com.example.myapplication.View
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.R
 import com.example.myapplication.ViewModel.AuthViewModel
 
 @Composable
@@ -15,56 +20,89 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        Box(
+        Column(
+
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 10.dp),
-            contentAlignment = Alignment.Center
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo de Alpha Squad",
+                modifier = Modifier
+                    .size(150.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
             Text(
                 "~ Alpha Squad ~",
                 style = MaterialTheme.typography.titleLarge,
             )
-        }
-        Spacer(modifier = Modifier.height(40.dp))
 
-        Text("Inicio de Sesión", style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.height(40.dp))
 
-        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Contraseña") })
 
-        Spacer(modifier = Modifier.height(10.dp))
+            Text("Inicio de Sesión", style = MaterialTheme.typography.headlineSmall)
 
-        Button(onClick = {
-            val resultado = viewModel.login(email, password, navController)
+            Spacer(modifier = Modifier.height(16.dp))
 
-            when {
-                viewModel.mensaje.value.contains("Administrador") -> {
-                    navController.navigate("admin")
-                }
-                resultado -> {
-                    navController.navigate("admin")
-                }
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Contraseña") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(
+                onClick = {
+                    viewModel.login(email, password, navController)
+                    val mensaje = viewModel.mensaje.value
+                    if (mensaje.contains("Administrador") || mensaje.contains("Bienvenido")) {
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Entrar")
             }
-        }) {
-            Text("Entrar")
-        }
+
+            if (viewModel.mensaje.value.isNotEmpty()) {
+                Text(
+                    text = viewModel.mensaje.value,
+                    modifier = Modifier.padding(top = 10.dp),
+                    color = if (viewModel.mensaje.value.contains("Error")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextButton(onClick = { navController.navigate("register") }) {
+                Text("¿No tienes cuenta? ¡Regístrate!")
+            }
 
 
-        Text(viewModel.mensaje.value, modifier = Modifier.padding(top = 10.dp))
-
-        TextButton(onClick = { navController.navigate("register") }) {
-            Text("¿No tienes cuenta? Registrate!")
-        }
-
-        TextButton(onClick = { navController.navigate("home/{email}") }) {
-            Text("Entrar a home")
+            TextButton(onClick = { navController.navigate("home/test@example.com") }) {
+                Text("Entrar a home (Test)")
+            }
         }
     }
 }
