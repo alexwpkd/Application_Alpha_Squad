@@ -91,7 +91,7 @@ fun CarritoScreen(
                         }
                     }
                 },
-                enabled = productos.isNotEmpty(), // deshabilita el botón si el carrito está vacío
+                enabled = productos.isNotEmpty(),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Comprar")

@@ -61,8 +61,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
         return sb.reverse().toString() + "-" + dv
     }
-    private fun validarEmail(email: String): Boolean =
-        Patterns.EMAIL_ADDRESS.matcher(email).matches()
+
+    private fun validarEmail(email: String): Boolean {
+        val regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+        return regex.matches(email)
+    }
 
     private fun validarPassword(password: String): Boolean =
         password.length >= 4 &&
