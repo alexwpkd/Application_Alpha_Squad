@@ -65,10 +65,6 @@ fun CatalogoScreen(
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
-            } else if (producto.isEmpty()) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No hay productos")
-                }
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
@@ -108,25 +104,12 @@ fun ProductoCard(
             Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val painter = producto.imagenUrl?.let { rememberAsyncImagePainter(it) }
-
-            if (painter != null) {
-                Image(
-                    painter = painter,
-                    contentDescription = producto.nombre,
-                    modifier = Modifier.size(80.dp),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                val resId = producto.imagenClave ?: android.R.drawable.ic_menu_report_image
-                Image(
-                    painter = painterResource(id = resId),
-                    contentDescription = producto.nombre,
-                    modifier = Modifier.size(80.dp),
-                    contentScale = ContentScale.Crop
-                )
-            }
-
+            Image(
+                painter = painterResource(id = producto.imagenClave),
+                contentDescription = producto.nombre,
+                modifier = Modifier.size(80.dp),
+                contentScale = ContentScale.Crop
+            )
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(producto.nombre, style = MaterialTheme.typography.titleMedium)

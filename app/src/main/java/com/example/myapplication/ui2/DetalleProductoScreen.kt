@@ -12,7 +12,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -74,27 +73,14 @@ fun DetalleProductoScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                val painter = p.imagenUrl?.let { rememberAsyncImagePainter(it) }
-
-                if (painter != null) {
-                    Image(
-                        painter = painter,
-                        contentDescription = p.nombre,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = p.imagenClave ?: android.R.drawable.ic_menu_report_image),
-                        contentDescription = p.nombre,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                Image(
+                    painter = painterResource(id = p.imagenClave),
+                    contentDescription = p.nombre,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentScale = ContentScale.Crop
+                )
 
                 Text(text = p.nombre, style = MaterialTheme.typography.titleLarge)
                 Text(text = "$${p.precio}", style = MaterialTheme.typography.titleMedium)
