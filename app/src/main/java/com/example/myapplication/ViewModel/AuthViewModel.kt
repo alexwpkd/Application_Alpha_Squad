@@ -3,20 +3,25 @@ package com.example.myapplication.ViewModel
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.myapplication.Model.FakeDatabase
 import com.example.myapplication.Model.Usuario
-import org.json.JSONObject
-import java.nio.charset.Charset
-import android.util.Patterns //Validar email
-import java.io.File
+import com.example.myapplication.remote.LoginRequest
+import com.example.myapplication.remote.RetrofitClient
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.io.File
+import java.nio.charset.Charset
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     var mensaje = mutableStateOf("")
     private val gson by lazy { GsonBuilder().setPrettyPrinting().create() }
+
+    // ================== VALIDACIONES ==================
 
     private fun validarRut(rut: String): Boolean {
         val clean = rut.replace(".", "").replace("-", "").replace(" ", "").uppercase()
@@ -80,8 +85,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         return if (faltas.isEmpty()) null else "La contraseña debe tener: ${faltas.joinToString(", ")}."
     }
 
-
     private fun noVacio(texto: String): Boolean = texto.trim().isNotEmpty()
+
+    // ================== ARCHIVO JSON LOCAL DE USUARIOS ==================
+
     /** Crea (si no existe) una carpeta interna 'usuarios' dentro de filesDir */
     private fun usuariosDir(): File {
         val dir = File(getApplication<Application>().filesDir, "usuarios")
@@ -125,20 +132,15 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         guardarUsuariosAArchivo(lista)
     }
 
+    // ================== REGISTRO (SIGUE LOCAL, COMO LO TENÍAS) ==================
 
     fun registrar(
         nombre: String,
-        //apellido: String,
         rut: String,
-        //region: String,
-        //comuna: String,
         direccion: String,
         email: String,
         password: String,
-        //telefono: String
-    )
-
-    {
+    ) {
         val nombreTrim = nombre.trim()
         val rutTrim = rut.trim()
         val direccionTrim = direccion.trim()
@@ -171,52 +173,99 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        val usuario_registro = Usuario(
+        val usuarioRegistro = Usuario(
             nombreTrim,
-            //apellido,
-            rutFormateado, // guardamos el RUT formateado
-            //region,
-            //comuna,
+            rutFormateado,
             direccionTrim,
             emailTrim,
             passwordRaw
-            //telefono
         )
 
-        if (FakeDatabase.registrar(usuario_registro)) {
-            agregarUsuarioAlJson(usuario_registro)
+        if (FakeDatabase.registrar(usuarioRegistro)) {
+            agregarUsuarioAlJson(usuarioRegistro)
             mensaje.value = "Registro exitoso"
         } else {
             mensaje.value = "El usuario ya existe"
         }
     }
 
-    //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
+    // ================== LOGIN ==================
 
     var usuarioActual = mutableStateOf<String?>(null)
 
+    /**
+     * Mantengo el tipo Boolean para no romper llamadas existentes,
+     * pero ahora el proceso real va en una corrutina.
+     */
     fun login(
         email: String,
         password: String,
         navController: NavController
     ): Boolean {
+        val emailTrim = email.trim()
+        val passwordTrim = password.trim()
 
-        if (esAdmin(email, password)) {
-            usuarioActual.value = email
-            mensaje.value = "Acceso consedido a usuario administrador"
-            return true
+        viewModelScope.launch {
+            // Validaciones básicas antes de llamar al backend
+            if (!validarEmail(emailTrim)) {
+                mensaje.value = "Email no válido"
+                return@launch
+            }
+            if (!validarPassword(passwordTrim)) {
+                mensaje.value = passwordError(passwordTrim) ?: "La contraseña no cumple los requisitos"
+                return@launch
+            }
+
+            try {
+                mensaje.value = ""
+
+                // 🔐 Llamada al backend
+                val resp = RetrofitClient.apiService.login(
+                    LoginRequest(
+                        correo = emailTrim,
+                        password = passwordTrim
+                    )
+                )
+
+                usuarioActual.value = resp.correo
+
+                // Mensaje según rol
+                mensaje.value = when (resp.rol) {
+                    "ADMIN" -> "Acceso concedido a usuario administrador"
+                    "EMPLEADO" -> "Bienvenido empleado"
+                    "CLIENTE" -> "Sesión iniciada"
+                    else -> "Sesión iniciada"
+                }
+
+                // Navegación según rol
+                when (resp.rol) {
+                    "ADMIN" -> navController.navigate("admin")
+                    else -> navController.navigate("home/${resp.correo}")
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+                // 🔄 Fallback: modo local si el backend no responde
+                if (esAdmin(emailTrim, passwordTrim)) {
+                    usuarioActual.value = emailTrim
+                    mensaje.value = "Acceso concedido a usuario administrador (local)"
+                    navController.navigate("admin")
+                } else if (FakeDatabase.login(emailTrim, passwordTrim)) {
+                    usuarioActual.value = emailTrim
+                    mensaje.value = "Sesión iniciada (modo local)"
+                    navController.navigate("home/$emailTrim")
+                } else {
+                    mensaje.value = "Credenciales inválidas o error de conexión"
+                }
+            }
         }
 
-        return if (FakeDatabase.login(email, password)) {
-            usuarioActual.value = email
-            mensaje.value = "Sesion iniciada"
-            navController.navigate("home/$email")
-            false
-        } else {
-            mensaje.value = "Credenciales inválidas!"
-            false
-        }
+        // El valor no se usa realmente en tu UI actual
+        return false
     }
+
+    // ================== ADMIN LOCAL (JSON EN assets) ==================
 
     private fun esAdmin(
         email: String,
