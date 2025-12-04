@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 fun administradorAgregarProducto(
     navController: NavController
 ) {
-    var id by remember { mutableStateOf(TextFieldValue("")) }
     var sku by remember { mutableStateOf(TextFieldValue("")) }
     var nombre by remember { mutableStateOf(TextFieldValue("")) }
     var categoria by remember { mutableStateOf(TextFieldValue("")) }
@@ -57,7 +56,6 @@ fun administradorAgregarProducto(
 
     fun productoAgregado(): Boolean {
         return (
-                id.text.isNotBlank() &&
                         sku.text.isNotBlank() &&
                         nombre.text.isNotBlank() &&
                         categoria.text.isNotBlank() &&
@@ -109,12 +107,6 @@ fun administradorAgregarProducto(
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
-
-                OutlinedTextField(
-                    value = id, onValueChange = { id = it },
-                    label = { Text("ID del producto (solo referencia local)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
 
                 OutlinedTextField(
                     value = sku, onValueChange = { sku = it },
@@ -220,7 +212,6 @@ fun administradorAgregarProducto(
                                     imagenUrl = imagenClave.text.trim()
                                 )
 
-                                // 🔐 Llamada al backend (requiere token de admin)
                                 RetrofitClient.apiService.crearProducto(dto)
 
                                 snackbarHostState.showSnackbar("Producto agregado en el servidor")
