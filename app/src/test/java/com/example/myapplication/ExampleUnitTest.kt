@@ -2,17 +2,14 @@ package com.example.myapplication
 
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.myapplication.Model.FakeDatabase
-import com.example.myapplication.Model.Usuario
 import com.example.myapplication.ViewModel.AuthViewModel
+import com.example.myapplication.ViewModel.CarritoViewModel
+import com.example.myapplication.Model.Producto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
-
-import com.example.myapplication.ViewModel.CarritoViewModel
-import com.example.myapplication.Model.Producto
 
 class ExampleUnitTest {
 
@@ -24,12 +21,15 @@ class ExampleUnitTest {
         return AuthViewModel(app)
     }
 
+    // ================== TESTS DE REGISTRO ==================
+
     @Test
     fun registrar_conRutInvalido_retornaError() {
         val vm = crearViewModel()
 
         vm.registrar(
             nombre = "Juan",
+            apellidos = "Pérez",
             rut = "123",
             direccion = "Calle Falsa 123",
             email = "juan@test.com",
@@ -45,6 +45,7 @@ class ExampleUnitTest {
 
         vm.registrar(
             nombre = "Juan",
+            apellidos = "Pérez",
             rut = "12.345.678-5",
             direccion = "Calle Falsa 123",
             email = "correo_invalido",
@@ -60,6 +61,7 @@ class ExampleUnitTest {
 
         vm.registrar(
             nombre = "Juan",
+            apellidos = "Pérez",
             rut = "12.345.678-5",
             direccion = "Calle Falsa 123",
             email = "test@test.com",
@@ -75,6 +77,7 @@ class ExampleUnitTest {
 
         vm.registrar(
             nombre = "",
+            apellidos = "Pérez",
             rut = "12.345.678-5",
             direccion = "Calle Falsa 123",
             email = "test@test.com",
@@ -90,6 +93,7 @@ class ExampleUnitTest {
 
         vm.registrar(
             nombre = "Juan",
+            apellidos = "Pérez",
             rut = "12.345.678-5",
             direccion = "",
             email = "test@test.com",
@@ -105,6 +109,7 @@ class ExampleUnitTest {
 
         vm.registrar(
             nombre = "Juan",
+            apellidos = "Pérez",
             rut = "12.345.678-5",
             direccion = "Calle Falsa 123",
             email = "test@test.com",
@@ -120,6 +125,7 @@ class ExampleUnitTest {
 
         vm.registrar(
             nombre = "Juan",
+            apellidos = "Pérez",
             rut = "12.345.678-5",
             direccion = "Calle Falsa 123",
             email = "test@test.com",
@@ -128,6 +134,8 @@ class ExampleUnitTest {
 
         assertTrue(vm.mensaje.value.contains("minúscula"))
     }
+
+    // ================== TESTS DE CARRITO ==================
 
     @Test
     fun agregarAlCarrito_productoAgregado() {
@@ -147,8 +155,10 @@ class ExampleUnitTest {
 
         vm.agregarAlCarrito(producto)
 
-        assertEquals(1, vm.carrito.value.size)
-        assertEquals(producto, vm.carrito.value.first())
+        val items = vm.items.value
+        assertEquals(1, items.size)
+        assertEquals(producto, items.first().producto)
+        assertEquals(1, items.first().cantidad)
     }
 
     @Test
@@ -184,14 +194,16 @@ class ExampleUnitTest {
         vm.agregarAlCarrito(p1)
         vm.agregarAlCarrito(p2)
 
-        vm.eliminarDelCarrito(p1)
+        // ahora eliminarDelCarrito recibe el ID (Int), no el Producto
+        vm.eliminarDelCarrito(p1.id)
 
-        assertEquals(1, vm.carrito.value.size)
-        assertEquals(p2, vm.carrito.value.first())
+        val items = vm.items.value
+        assertEquals(1, items.size)
+        assertEquals(p2, items.first().producto)
     }
 
     @Test
-    fun realizarCompra_conProductos_vaciaCarritoYRetornaTrue() {
+    fun realizarCompra_conProductos_vaciaCarrito() {
         val vm = CarritoViewModel()
 
         val producto = Producto(
@@ -209,9 +221,9 @@ class ExampleUnitTest {
 
         vm.agregarAlCarrito(producto)
 
-        val result = vm.realizarCompra()
+        // antes llamabas a realizarCompra(), ahora usamos vaciarCarrito()
+        vm.vaciarCarrito()
 
-        assertTrue(result)
-        assertTrue(vm.carrito.value.isEmpty())
+        assertTrue(vm.items.value.isEmpty())
     }
 }
