@@ -1,5 +1,5 @@
 package com.example.myapplication.ui2
-
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -12,13 +12,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ViewModel.CarritoViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,7 +49,7 @@ fun DetalleProductoScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             painter = painterResource(id = android.R.drawable.ic_media_previous),
-                                    contentDescription = "Volver"
+                            contentDescription = "Volver"
                         )
                     }
                 }
@@ -73,8 +69,15 @@ fun DetalleProductoScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+
+                val painter = if (!p.imagenUrl.isNullOrBlank()) {
+                    rememberAsyncImagePainter(p.imagenUrl)
+                } else {
+                    painterResource(id = p.imagenClave)
+                }
+
                 Image(
-                    painter = painterResource(id = p.imagenClave),
+                    painter = painter,
                     contentDescription = p.nombre,
                     modifier = Modifier
                         .fillMaxWidth()

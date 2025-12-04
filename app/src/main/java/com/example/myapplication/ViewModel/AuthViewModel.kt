@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.myapplication.Model.FakeDatabase
 import com.example.myapplication.Model.Usuario
+import com.example.myapplication.remote.ClienteRegistroRequest
 import com.example.myapplication.remote.LoginRequest
 import com.example.myapplication.remote.RetrofitClient
 import com.google.gson.GsonBuilder
@@ -87,9 +88,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun noVacio(texto: String): Boolean = texto.trim().isNotEmpty()
 
-    // ================== ARCHIVO JSON LOCAL DE USUARIOS ==================
+    // ================== ARCHIVO JSON LOCAL DE USUARIOS (opcional, lo dejo por si lo usas) ==================
 
-    /** Crea (si no existe) una carpeta interna 'usuarios' dentro de filesDir */
     private fun usuariosDir(): File {
         val dir = File(getApplication<Application>().filesDir, "usuarios")
         if (!dir.exists()) dir.mkdirs()
@@ -102,7 +102,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         return file
     }
 
-    /** Carga todos los usuarios guardados como lista mutable */
     private fun cargarUsuariosDesdeArchivo(): MutableList<Usuario> {
         val file = usuariosFile()
         return try {
@@ -132,16 +131,18 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         guardarUsuariosAArchivo(lista)
     }
 
-    // ================== REGISTRO (SIGUE LOCAL, COMO LO TENÍAS) ==================
+    // ================== REGISTRO (AHORA USA BACKEND) ==================
 
     fun registrar(
         nombre: String,
+        apellidos: String,
         rut: String,
         direccion: String,
         email: String,
         password: String,
     ) {
         val nombreTrim = nombre.trim()
+        val apellidosTrim = apellidos.trim()
         val rutTrim = rut.trim()
         val direccionTrim = direccion.trim()
         val emailTrim = email.trim()
@@ -149,6 +150,11 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
         if (!noVacio(nombreTrim)) {
             mensaje.value = "El nombre es obligatorio"
+            return
+        }
+
+        if (!noVacio(apellidosTrim)) {
+            mensaje.value = "El apellido es obligatorio"
             return
         }
 
@@ -173,30 +179,44 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
-        val usuarioRegistro = Usuario(
-            nombreTrim,
-            rutFormateado,
-            direccionTrim,
-            emailTrim,
-            passwordRaw
-        )
+        viewModelScope.launch {
+            try {
+                mensaje.value = ""
 
-        if (FakeDatabase.registrar(usuarioRegistro)) {
-            agregarUsuarioAlJson(usuarioRegistro)
-            mensaje.value = "Registro exitoso"
-        } else {
-            mensaje.value = "El usuario ya existe"
+                val req = ClienteRegistroRequest(
+                    nombre = nombreTrim,
+                    apellidos = apellidosTrim,
+                    rut = rutFormateado,
+                    correo = emailTrim,
+                    password = passwordRaw,
+                    direccion = direccionTrim
+                )
+
+                val resp = RetrofitClient.apiService.registrarCliente(req)
+
+                // opcional: también lo guardas localmente si quieres
+                val usuarioRegistro = Usuario(
+                    nombreTrim,
+                    rutFormateado,
+                    direccionTrim,
+                    emailTrim,
+                    passwordRaw
+                )
+                agregarUsuarioAlJson(usuarioRegistro)
+
+                mensaje.value = "Registro exitoso para ${resp.correo}"
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                mensaje.value = "Error al registrar: ${e.message}"
+            }
         }
     }
 
-    // ================== LOGIN ==================
+    // ================== LOGIN (YA USA BACKEND) ==================
 
     var usuarioActual = mutableStateOf<String?>(null)
 
-    /**
-     * Mantengo el tipo Boolean para no romper llamadas existentes,
-     * pero ahora el proceso real va en una corrutina.
-     */
     fun login(
         email: String,
         password: String,
@@ -206,7 +226,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         val passwordTrim = password.trim()
 
         viewModelScope.launch {
-            // Validaciones básicas antes de llamar al backend
             if (!validarEmail(emailTrim)) {
                 mensaje.value = "Email no válido"
                 return@launch
@@ -219,7 +238,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 mensaje.value = ""
 
-                // 🔐 Llamada al backend
                 val resp = RetrofitClient.apiService.login(
                     LoginRequest(
                         correo = emailTrim,
@@ -227,9 +245,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     )
                 )
 
+                RetrofitClient.setToken(resp.token)
+
                 usuarioActual.value = resp.correo
 
-                // Mensaje según rol
                 mensaje.value = when (resp.rol) {
                     "ADMIN" -> "Acceso concedido a usuario administrador"
                     "EMPLEADO" -> "Bienvenido empleado"
@@ -237,7 +256,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                     else -> "Sesión iniciada"
                 }
 
-                // Navegación según rol
                 when (resp.rol) {
                     "ADMIN" -> navController.navigate("admin")
                     else -> navController.navigate("home/${resp.correo}")
@@ -246,7 +264,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 e.printStackTrace()
 
-                // 🔄 Fallback: modo local si el backend no responde
                 if (esAdmin(emailTrim, passwordTrim)) {
                     usuarioActual.value = emailTrim
                     mensaje.value = "Acceso concedido a usuario administrador (local)"
@@ -261,7 +278,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        // El valor no se usa realmente en tu UI actual
         return false
     }
 
