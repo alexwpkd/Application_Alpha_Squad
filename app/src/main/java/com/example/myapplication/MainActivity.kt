@@ -9,6 +9,8 @@ import com.example.myapplication.ViewModel.AuthViewModel
 import com.example.myapplication.View.*
 import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ui2.CatalogoScreen
+import com.example.myapplication.ui2.CarritoScreen
+
 //
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
