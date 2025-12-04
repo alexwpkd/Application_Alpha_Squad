@@ -11,5 +11,6 @@ data class Producto(
     val stock: Int,
     val imagenClave: Int,
     val descripcion: String,
+    // 👇 URL que viene del backend (puede ser null)
     val imagenUrl: String? = null
 )

@@ -112,6 +112,4 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.7.0")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
     testImplementation("org.robolectric:robolectric:4.11.1")
-
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.34.0")
 }

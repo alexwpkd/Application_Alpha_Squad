@@ -27,6 +27,7 @@ class CatalogoViewModel(
             _loading.value = true
             _error.value = null
             try {
+                // 👉 AQUÍ ahora va al repo nuevo (API + Room + assets)
                 val list = repo.getProductos(context)
                 _productos.value = list
             } catch (e: Exception) {

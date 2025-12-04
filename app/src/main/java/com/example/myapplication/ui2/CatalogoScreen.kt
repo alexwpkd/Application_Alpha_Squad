@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.example.myapplication.ui2
 
 import android.annotation.SuppressLint
@@ -24,8 +22,6 @@ import com.example.myapplication.Model.Producto
 import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ViewModel.CarritoViewModel
 import com.example.myapplication.ui.theme.ProductCard_Color
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,52 +31,45 @@ fun CatalogoScreen(
     carritoViewModel: CarritoViewModel
 ) {
     val context = LocalContext.current
-
-    val productos by catalogViewModel.productos.collectAsState()
+    val producto by catalogViewModel.productos.collectAsState()
     val loading by catalogViewModel.loading.collectAsState()
 
     LaunchedEffect(Unit) {
         catalogViewModel.cargarProductos(context)
     }
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Catalogo de productos\nAlpha Squad") },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(
+            title = { Text("Catalogo de productos\nAlpha Squad") },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+        )
 
-            )
-
-            TextButton(onClick = { navController.navigate("home/{email}") }) {
-                Text("Volver")
-            }
+        TextButton(onClick = { navController.navigate("home/{email}") }) {
+            Text("Volver")
         }
-    ) { padding ->
-
-        SwipeRefresh(
-            state = rememberSwipeRefreshState(isRefreshing = loading),
-            onRefresh = {
-                catalogViewModel.cargarProductos(context)
-            },
-            modifier = Modifier.padding(padding)
-        ) {
-
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(productos, key = { it.id }) { producto ->
-                    ProductoCard(
-                        producto = producto,
-                        onDetalle = { navController.navigate("detalle/${producto.id}") }
-                    )
+    }) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+            if (loading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(producto, key = { it.id }) { producto ->
+                        ProductoCard(
+                            producto = producto,
+                            onDetalle = { navController.navigate("detalle/${producto.id}") }
+                        )
+                    }
                 }
             }
         }
     }
 }
-
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -99,6 +88,7 @@ fun ProductoCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
+            // 👇 si viene URL desde la API, usamos Coil; si no, fallback a drawable local
             val painter = if (!producto.imagenUrl.isNullOrBlank()) {
                 rememberAsyncImagePainter(producto.imagenUrl)
             } else {
