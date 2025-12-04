@@ -6,27 +6,29 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://54.87.10.251:8080/"
 
-    // Guardamos el token JWT que devuelve el backend
+    private const val BASE_URL = "http://54.198.242.155:8080/"
+
+
     @Volatile
-    private var authToken: String? = null
+    private var token: String? = null
 
-    fun setToken(token: String?) {
-        authToken = token
+    fun setToken(newToken: String?) {
+        token = newToken
     }
 
-    // Cliente HTTP con interceptor que agrega el header Authorization si hay token
-    private val okHttpClient: OkHttpClient by lazy {
+    private val client: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val original = chain.request()
                 val builder = original.newBuilder()
 
-                authToken?.let { token ->
-                    builder.addHeader("Authorization", "Bearer $token")
+
+                token?.let {
+                    builder.addHeader("Authorization", "Bearer $it")
                 }
 
+                builder.addHeader("Content-Type", "application/json")
                 chain.proceed(builder.build())
             }
             .build()
@@ -35,7 +37,7 @@ object RetrofitClient {
     val apiService: ApiService by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(okHttpClient)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)

@@ -92,12 +92,10 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     // Proc. anotaciones Room (mismo número de versión que runtime/ktx)
     ksp("androidx.room:room-compiler:2.6.1")
-    // ksp("androidx.room:room-compiler:2.5.0") // Versión antigua / incoherente con 2.6.1
 
     // --- Imágenes (Coil) ---
     implementation("io.coil-kt:coil:2.5.0")
     implementation("io.coil-kt:coil-compose:2.5.0")
-    // implementation("io.coil-kt:coil-compose:2.3.0") // Duplicada / versión antigua
 
     // --- Tests ---
     testImplementation(libs.junit)
