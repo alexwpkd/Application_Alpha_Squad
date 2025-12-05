@@ -41,4 +41,13 @@ interface ApiService {
     suspend fun checkout(
         @Path("idCliente") idCliente: Long
     ): VentaDto
+
+    @POST("auth/login")
+    suspend fun login(@Body request: LoginRequest): LoginResponse
+
+    @POST("auth/registro/cliente")
+    suspend fun registrarCliente(@Body request: ClienteRegistroRequest): ClienteResponse
+
+    @POST("api/productos")
+    suspend fun crearProducto(@Body dto: ProductoCreateRequest): ProductoDto
 }

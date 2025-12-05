@@ -11,43 +11,64 @@ import kotlinx.coroutines.launch
 
 class CarritoViewModel : ViewModel() {
 
-    private val _items = MutableStateFlow<List<Carrito>>(emptyList())
-    val items: StateFlow<List<Carrito>> = _items
+    private val _carrito = MutableStateFlow<List<Carrito>>(emptyList())
+    val carrito: StateFlow<List<Carrito>> = _carrito
 
+    private val _total = MutableStateFlow(0)
+    val total: StateFlow<Int> = _total
 
+    private fun recalcularTotal() {
+        _total.value = _carrito.value.sumOf { it.producto.precio * it.cantidad }
+    }
 
     fun agregarAlCarrito(producto: Producto) {
-        val listaActual = _items.value.toMutableList()
-        val existenteIndex = listaActual.indexOfFirst { it.producto.id == producto.id }
+        val listaActual = _carrito.value.toMutableList()
+        val index = listaActual.indexOfFirst { it.producto.id == producto.id }
 
-        if (existenteIndex >= 0) {
-            val existente = listaActual[existenteIndex]
-            listaActual[existenteIndex] = existente.copy(cantidad = existente.cantidad + 1)
+        if (index >= 0) {
+            val item = listaActual[index]
+            listaActual[index] = item.copy(cantidad = item.cantidad + 1)
         } else {
-            listaActual.add(Carrito(producto = producto, cantidad = 1))
+            listaActual.add(Carrito(producto, 1))
         }
 
-        _items.value = listaActual
+        _carrito.value = listaActual
+        recalcularTotal()
     }
 
     fun eliminarDelCarrito(productoId: Int) {
-        val nuevaLista = _items.value.filterNot { it.producto.id == productoId }
-        _items.value = nuevaLista
+        _carrito.value = _carrito.value.filterNot { it.producto.id == productoId }
+        recalcularTotal()
     }
 
     fun vaciarCarrito() {
-        _items.value = emptyList()
+        _carrito.value = emptyList()
+        recalcularTotal()
     }
 
-    fun total(): Int =
-        _items.value.sumOf { it.producto.precio * it.cantidad }
+    fun actualizarCantidad(productoId: Int, nuevaCantidad: Int) {
+        if (nuevaCantidad <= 0) {
+            eliminarDelCarrito(productoId)
+            return
+        }
 
+        val listaActual = _carrito.value.toMutableList()
+        val index = listaActual.indexOfFirst { it.producto.id == productoId }
+
+        if (index >= 0) {
+            val item = listaActual[index]
+            listaActual[index] = item.copy(cantidad = nuevaCantidad)
+        }
+
+        _carrito.value = listaActual
+        recalcularTotal()
+    }
 
     fun checkoutRemoto(
         idCliente: Long,
         onResultado: (Boolean, String) -> Unit
     ) {
-        val itemsActuales = _items.value
+        val itemsActuales = _carrito.value
         if (itemsActuales.isEmpty()) {
             onResultado(false, "El carrito está vacío")
             return
@@ -57,13 +78,9 @@ class CarritoViewModel : ViewModel() {
             try {
                 val api = RetrofitClient.apiService
 
-
                 try {
                     api.vaciarCarritoRemoto(idCliente)
-                } catch (_: Exception) {
-
-                }
-
+                } catch (_: Exception) { }
 
                 for (item in itemsActuales) {
                     api.agregarProductoAlCarrito(
@@ -73,17 +90,15 @@ class CarritoViewModel : ViewModel() {
                     )
                 }
 
-
                 val venta = api.checkout(idCliente)
 
-
-                _items.value = emptyList()
+                vaciarCarrito()
 
                 onResultado(true, "Compra realizada. Total: ${venta.total} CLP")
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                onResultado(false, "Error al procesar la compra: ${e.message}")
+                onResultado(false, "Error: ${e.message}")
             }
         }
     }

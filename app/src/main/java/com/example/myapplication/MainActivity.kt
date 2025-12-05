@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("carrito") {
-                            CarritoScreen(navController, carritoViewModel)
+                            CarritoScreen(carritoViewModel, navController)
                         }
 
                         composable("catalogue") {
