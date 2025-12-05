@@ -220,6 +220,7 @@ fun administradorAgregarProducto(
                                     imagenUrl = imagenClave.text.trim()
                                 )
 
+                                // 🔐 Llamada al backend (requiere token de admin)
                                 RetrofitClient.apiService.crearProducto(dto)
 
                                 snackbarHostState.showSnackbar("Producto agregado en el servidor")
@@ -227,7 +228,7 @@ fun administradorAgregarProducto(
                                 navController.navigate("admin")
                             } catch (e: Exception) {
                                 e.printStackTrace()
-                                snackbarHostState.showSnackbar("Error al crear producto: precio o stock en números negativos")
+                                snackbarHostState.showSnackbar("Error al crear producto: ${e.message}")
                             } finally {
                                 loading = false
                             }

@@ -3,7 +3,7 @@ package com.example.myapplication
 import android.app.Application
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.myapplication.ViewModel.AuthViewModel
-import com.example.myapplication.ViewModel.CarrionViewModel
+import com.example.myapplication.ViewModel.CarritoViewModel
 import com.example.myapplication.Model.Producto
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -139,7 +139,7 @@ class ExampleUnitTest {
 
     @Test
     fun agregarAlCarrito_productoAgregado() {
-        val vm = CarrionViewModel()
+        val vm = CarritoViewModel()
         val producto = Producto(
             id = 1,
             sku = "SKU001",
@@ -163,7 +163,7 @@ class ExampleUnitTest {
 
     @Test
     fun eliminarDelCarrito_productoEliminado() {
-        val vm = CarrionViewModel()
+        val vm = CarritoViewModel()
 
         val p1 = Producto(
             id = 1,
@@ -204,7 +204,7 @@ class ExampleUnitTest {
 
     @Test
     fun realizarCompra_conProductos_vaciaCarrito() {
-        val vm = CarrionViewModel()
+        val vm = CarritoViewModel()
 
         val producto = Producto(
             id = 1,

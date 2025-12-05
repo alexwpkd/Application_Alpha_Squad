@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
 
 
-    private const val BASE_URL = "http://54.226.186.59:8080/"
+    private const val BASE_URL = "http://54.198.242.155:8080/"
 
 
     @Volatile

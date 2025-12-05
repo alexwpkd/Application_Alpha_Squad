@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -19,7 +20,7 @@ import coil.compose.rememberAsyncImagePainter
 import androidx.compose.ui.res.painterResource
 import com.example.myapplication.Model.Producto
 import com.example.myapplication.ViewModel.CatalogoViewModel
-import com.example.myapplication.ViewModel.CarrionViewModel
+import com.example.myapplication.ViewModel.CarritoViewModel
 import com.example.myapplication.ui.theme.ProductCard_Color
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -27,7 +28,7 @@ import com.example.myapplication.ui.theme.ProductCard_Color
 fun CatalogoScreen(
     navController: NavController,
     catalogViewModel: CatalogoViewModel,
-    carritoViewModel: CarrionViewModel
+    carritoViewModel: CarritoViewModel
 ) {
     val context = LocalContext.current
     val producto by catalogViewModel.productos.collectAsState()
