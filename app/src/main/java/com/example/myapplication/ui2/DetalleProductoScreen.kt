@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.myapplication.ViewModel.CatalogoViewModel
-import com.example.myapplication.ViewModel.CarritoViewModel
+import com.example.myapplication.ViewModel.CarrionViewModel
 import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,7 +21,7 @@ import coil.compose.rememberAsyncImagePainter
 fun DetalleProductoScreen(
     productoId: Int,
     viewModel: CatalogoViewModel,
-    carritoViewModel: CarritoViewModel,
+    carritoViewModel: CarrionViewModel,
     navController: NavController
 ) {
     val context = LocalContext.current

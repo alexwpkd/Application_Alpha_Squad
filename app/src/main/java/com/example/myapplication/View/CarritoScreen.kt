@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class CarritoViewModel : ViewModel() {
+class CarrionViewModel : ViewModel() {
 
     private val _items = MutableStateFlow<List<Carrito>>(emptyList())
     val items: StateFlow<List<Carrito>> = _items
@@ -75,8 +75,6 @@ class CarritoViewModel : ViewModel() {
 
 
                 val venta = api.checkout(idCliente)
-
-                // 4) Vaciar carrito local
                 _items.value = emptyList()
 
                 onResultado(true, "Compra realizada. Total: ${venta.total} CLP")

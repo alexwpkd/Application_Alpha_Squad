@@ -3,15 +3,12 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.navigation.compose.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myapplication.ViewModel.AuthViewModel
 import com.example.myapplication.View.*
 import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ui2.CatalogoScreen
-import com.example.myapplication.ui2.CarritoScreen
 
-//
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,7 +21,7 @@ import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.navigation.NavType
 import com.example.myapplication.ui2.DetalleProductoScreen
 import androidx.navigation.navArgument
-import com.example.myapplication.ViewModel.CarritoViewModel
+import com.example.myapplication.ViewModel.CarrionViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -40,8 +37,7 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     val viewModel: AuthViewModel = viewModel()
                     val catalogoViewModel: CatalogoViewModel = viewModel()
-                    val catalogViewModel = CatalogoViewModel()
-                    val carritoViewModel: CarritoViewModel = viewModel()
+                    val carritoViewModel: CarrionViewModel = viewModel()
 
 
                     NavHost(navController, startDestination = "login") {
@@ -59,12 +55,8 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(navController, email)
                         }
 
-                        composable("carrito") {
-                            CarritoScreen(navController, carritoViewModel)
-                        }
-
                         composable("catalogue") {
-                            CatalogoScreen(navController, catalogViewModel, carritoViewModel)
+                            CatalogoScreen(navController, catalogoViewModel, carritoViewModel)
                         }
 
                         composable("admin") {
@@ -83,11 +75,8 @@ class MainActivity : ComponentActivity() {
                             arguments = listOf(navArgument("productoId") { type = NavType.IntType })
                         ) { backStackEntry ->
                             val id = backStackEntry.arguments?.getInt("productoId") ?: -1
-                            DetalleProductoScreen(productoId = id, viewModel = catalogoViewModel, carritoViewModel = carritoViewModel, navController = navController)
-
-                            DetalleProductoScreen(
-                                productoId = id,
-                                viewModel = catalogViewModel,
+                            DetalleProductoScreen(productoId = id,
+                                viewModel = catalogoViewModel,
                                 carritoViewModel = carritoViewModel,
                                 navController = navController
                             )
