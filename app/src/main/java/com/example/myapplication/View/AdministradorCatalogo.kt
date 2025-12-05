@@ -1,79 +1,110 @@
 package com.example.myapplication.View
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import androidx.compose.ui.res.painterResource
 import com.example.myapplication.Model.Producto
-import com.example.myapplication.util.loadProducts
+import com.example.myapplication.ViewModel.CatalogoViewModel
+import com.example.myapplication.ui.theme.ProductCard_Color
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun administradorCatalogo(
-    navController: NavController
+fun AdminCatalogScreen(
+    navController: NavController,
+    catalogViewModel: CatalogoViewModel
 ) {
     val context = LocalContext.current
-
-    var productos by remember {
-        mutableStateOf(emptyList<Producto>())
-    }
+    val productos by catalogViewModel.productos.collectAsState()
+    val loading by catalogViewModel.loading.collectAsState()
 
     LaunchedEffect(Unit) {
-        productos = loadProducts(context)
+        catalogViewModel.cargarProductos(context)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text("Carrito de compras")
-        Spacer(modifier = Modifier.height(15.dp))
-
-        TextButton(onClick = { navController.navigate("admin") }) {
-            Text("Volver")
-        }
-
-        if (productos.isEmpty()) {
-            Text("No hay productos")
-        } else {
-            LazyColumn {
-                items(productos) {
-                        producto -> Card (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
-                        Text("Precio: $${producto.precio}")
-                        Text(producto.descripcion)
-                        val painter = rememberAsyncImagePainter(producto.imagenClave)
-                        Image(painter = painter, contentDescription = producto.nombre, modifier = Modifier.size(80.dp), contentScale = ContentScale.Crop)
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Catálogo (Admin)") },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+                navigationIcon = {
+                    TextButton(onClick = { navController.navigate("admin") }) {
+                        Text("Volver")
                     }
                 }
+            )
+        }
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+
+            if (loading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
                 }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(productos, key = { it.id }) { producto ->
+                        ProductoCardAdminViewOnly(producto)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@SuppressLint("DefaultLocale")
+@Composable
+fun ProductoCardAdminViewOnly(
+    producto: Producto
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = ProductCard_Color)
+    ) {
+        Row(
+            Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            val painter = if (!producto.imagenUrl.isNullOrBlank()) {
+                rememberAsyncImagePainter(producto.imagenUrl)
+            } else {
+                painterResource(id = producto.imagenClave)
+            }
+
+            Image(
+                painter = painter,
+                contentDescription = producto.nombre,
+                modifier = Modifier.size(80.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(Modifier.width(12.dp))
+
+            Column(Modifier.weight(1f)) {
+                Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
+                Text("Precio: $${producto.precio}", style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(producto.descripcion)
             }
         }
     }

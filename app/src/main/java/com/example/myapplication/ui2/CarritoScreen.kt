@@ -132,6 +132,7 @@ fun CarritoScreen(
 
     if (mostrarError) {
         AlertDialog(
+
             onDismissRequest = { mostrarError = false },
             title = { Text("Carrito vacío") },
             text = { Text("No puedes realizar una compra sin productos.") },
@@ -143,6 +144,34 @@ fun CarritoScreen(
                 }
             }
         )
+
+        if (mostrarDialogo) {
+            AlertDialog(
+                onDismissRequest = { mostrarDialogo = false },
+                title = { Text("Confirmar compra") },
+                text = { Text("¿Deseas finalizar tu compra?") },
+                confirmButton = {
+                    TextButton(onClick = {
+
+                        carritoViewModel.realizarCompra(1L) { exito, mensaje ->
+                            if (exito) {
+                                mostrarDialogo = false
+                                navController.navigate("home/{email}")
+                            } else {
+                            }
+                        }
+
+                    }) {
+                        Text("Confirmar")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { mostrarDialogo = false }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
+        }
     }
 
 }

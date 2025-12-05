@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("adminCatalogue") {
-                            administradorCatalogo(navController)
+                            AdminCatalogScreen(navController, catalogViewModel)
                         }
 
                         composable("adminProductAdd") {

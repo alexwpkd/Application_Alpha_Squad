@@ -88,7 +88,6 @@ fun ProductoCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            // 👇 si viene URL desde la API, usamos Coil; si no, fallback a drawable local
             val painter = if (!producto.imagenUrl.isNullOrBlank()) {
                 rememberAsyncImagePainter(producto.imagenUrl)
             } else {

@@ -36,6 +36,10 @@ class CarritoViewModel : ViewModel() {
         recalcularTotal()
     }
 
+    fun realizarCompra(idCliente: Long, onResultado: (Boolean, String) -> Unit) {
+        checkoutRemoto(idCliente, onResultado)
+    }
+
     fun eliminarDelCarrito(productoId: Int) {
         _carrito.value = _carrito.value.filterNot { it.producto.id == productoId }
         recalcularTotal()
