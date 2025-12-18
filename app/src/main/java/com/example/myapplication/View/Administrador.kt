@@ -15,12 +15,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.myapplication.ViewModel.AuthViewModel
 
 @Composable
 fun administrador(
     navController: NavController
 ) {
+    // Tomamos el AuthViewModel para poder hacer logout real
+    val authViewModel: AuthViewModel = viewModel()
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -84,7 +90,8 @@ fun administrador(
                     icon = Icons.Default.ExitToApp,
                     color = MaterialTheme.colorScheme.tertiaryContainer
                 ) {
-                    navController.navigate("home/{email}")
+                    // ✅ Logout real (borra token y vuelve a login limpiando historial)
+                    authViewModel.logout(navController)
                 }
             }
         }

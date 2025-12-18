@@ -20,6 +20,7 @@ import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ViewModel.CarritoViewModel
 import com.example.myapplication.ViewModel.CompraTacticaViewModel
 import com.example.myapplication.ui.theme.ProductCard_Color
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +32,9 @@ fun CompraTacticaScreen(
 ) {
     val context = LocalContext.current
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         if (catalogoViewModel.productos.value.isEmpty()) {
             catalogoViewModel.cargarProductos(context)
@@ -41,7 +45,6 @@ fun CompraTacticaScreen(
     val loading by catalogoViewModel.loading.collectAsState()
     val seleccion by tacticaViewModel.seleccion.collectAsState()
 
-    // Tabs por categoria
     val categorias = remember(productos) {
         listOf("Todo") + productos.map { it.categoria }.distinct()
     }
@@ -60,6 +63,7 @@ fun CompraTacticaScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Compra táctica") },
@@ -94,10 +98,13 @@ fun CompraTacticaScreen(
 
                     Button(
                         onClick = {
-                            // Traspaso al carrito normal
+                            // Traspaso al carrito normal (ya viene limitado por stock, pero igual lo protegemos)
                             seleccion.forEach { (id, cant) ->
                                 val p = productos.firstOrNull { it.id == id }
-                                if (p != null) carritoViewModel.agregarAlCarrito(p, cant)
+                                if (p != null) {
+                                    val cantOk = cant.coerceAtMost(p.stock)
+                                    if (cantOk > 0) carritoViewModel.agregarAlCarrito(p, cantOk)
+                                }
                             }
                             tacticaViewModel.limpiar()
                             navController.navigate("carrito")
@@ -137,11 +144,26 @@ fun CompraTacticaScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(productosFiltrados, key = { it.id }) { p ->
+                        val cantActual = seleccion[p.id] ?: 0
+
                         CompraTacticaItem(
                             producto = p,
-                            cantidadSeleccionada = seleccion[p.id] ?: 0,
+                            cantidadSeleccionada = cantActual,
                             onMas = {
-                                if (p.enStock && p.stock > 0) tacticaViewModel.incrementar(p.id, p.stock)
+                                if (p.enStock && p.stock > 0) {
+                                    val ok = tacticaViewModel.incrementar(p.id, p.stock)
+                                    if (!ok) {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Stock máximo alcanzado (${p.stock})"
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Producto sin stock")
+                                    }
+                                }
                             },
                             onMenos = { tacticaViewModel.decrementar(p.id) }
                         )
@@ -161,7 +183,6 @@ private fun CompraTacticaItem(
 ) {
     val disponible = producto.enStock && producto.stock > 0
 
-    // ✅ MISMO LOOK QUE CATÁLOGO
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
@@ -206,10 +227,8 @@ private fun CompraTacticaItem(
 
                 Text(cantidadSeleccionada.toString(), modifier = Modifier.width(24.dp))
 
-                IconButton(
-                    onClick = onMas,
-                    enabled = disponible && cantidadSeleccionada < producto.stock
-                ) {
+                // 👇 Solo se deshabilita si NO hay stock. Si está al máximo, sigue clickeable y avisa con Snackbar.
+                IconButton(onClick = onMas, enabled = disponible) {
                     Icon(
                         painter = painterResource(id = android.R.drawable.ic_input_add),
                         contentDescription = "Más"

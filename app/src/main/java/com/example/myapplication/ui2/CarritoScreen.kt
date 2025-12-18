@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +17,9 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.Model.Carrito
 import com.example.myapplication.ViewModel.CarritoViewModel
+import com.example.myapplication.ui.theme.ProductCard_Color
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,10 +29,15 @@ fun CarritoScreen(
 ) {
     val items by carritoViewModel.carrito.collectAsState()
     val total by carritoViewModel.total.collectAsState()
+
     var mostrarDialogo by remember { mutableStateOf(false) }
     var mostrarError by remember { mutableStateOf(false) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Carrito") },
@@ -171,12 +180,22 @@ fun CarritoScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        carritoViewModel.realizarCompra(1L) { exito, _ ->
+                        carritoViewModel.realizarCompra(1L) { exito, mensaje ->
                             if (exito) {
                                 mostrarDialogo = false
-                                navController.navigate("home") {
-                                    launchSingleTop = true
-                                    popUpTo("home") { inclusive = false }
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        "Compra realizada con éxito. Regresando al menú…"
+                                    )
+                                    delay(1200)
+                                    navController.navigate("home") {
+                                        popUpTo(0) { inclusive = true }
+                                        launchSingleTop = true
+                                    }
+                                }
+                            } else {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(mensaje)
                                 }
                             }
                         }
@@ -207,7 +226,9 @@ private fun CarritoItemRow(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(2.dp)
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = ProductCard_Color)
     ) {
         Row(
             modifier = Modifier

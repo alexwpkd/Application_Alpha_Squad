@@ -20,7 +20,21 @@ import java.nio.charset.Charset
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     var mensaje = mutableStateOf("")
+    var usuarioActual = mutableStateOf<String?>(null)
+
     private val gson by lazy { GsonBuilder().setPrettyPrinting().create() }
+
+    // --- LOGOUT REAL (TOKEN + BACKSTACK) ---
+    fun logout(navController: NavController) {
+        RetrofitClient.setToken(null)
+        usuarioActual.value = null
+        mensaje.value = ""
+
+        navController.navigate("login") {
+            popUpTo(0) { inclusive = true }
+            launchSingleTop = true
+        }
+    }
 
     private fun validarRut(rut: String): Boolean {
         val clean = rut.replace(".", "").replace("-", "").replace(" ", "").uppercase()
@@ -144,46 +158,15 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         val emailTrim = email.trim()
         val passwordRaw = password
 
-        if (!noVacio(nombreTrim)) {
-            mensaje.value = "El nombre es obligatorio"
-            return
-        }
-
-        if (!noVacio(apellidosTrim)) {
-            mensaje.value = "El apellido es obligatorio"
-            return
-        }
-
-        if (!validarRut(rutTrim)) {
-            mensaje.value = "RUT inválido. Ejemplo: 12.345.678-5"
-            return
-        }
+        if (!noVacio(nombreTrim)) { mensaje.value = "El nombre es obligatorio"; return }
+        if (!noVacio(apellidosTrim)) { mensaje.value = "El apellido es obligatorio"; return }
+        if (!validarRut(rutTrim)) { mensaje.value = "RUT inválido. Ejemplo: 12.345.678-5"; return }
         val rutFormateado = formatearRut(rutTrim)
-
-        if (!regionSeleccionada) {
-            mensaje.value = "Debes seleccionar una región"
-            return
-        }
-
-        if (!comunaSeleccionada) {
-            mensaje.value = "Debes seleccionar una comuna"
-            return
-        }
-
-        if (!noVacio(direccionTrim)) {
-            mensaje.value = "La dirección es obligatoria"
-            return
-        }
-
-        if (!validarEmail(emailTrim)) {
-            mensaje.value = "Email no válido"
-            return
-        }
-
-        if (!validarPassword(passwordRaw)) {
-            mensaje.value = passwordError(passwordRaw) ?: "La contraseña no cumple los requisitos"
-            return
-        }
+        if (!regionSeleccionada) { mensaje.value = "Debes seleccionar una región"; return }
+        if (!comunaSeleccionada) { mensaje.value = "Debes seleccionar una comuna"; return }
+        if (!noVacio(direccionTrim)) { mensaje.value = "La dirección es obligatoria"; return }
+        if (!validarEmail(emailTrim)) { mensaje.value = "Email no válido"; return }
+        if (!validarPassword(passwordRaw)) { mensaje.value = passwordError(passwordRaw) ?: "La contraseña no cumple los requisitos"; return }
 
         viewModelScope.launch {
             try {
@@ -218,38 +201,22 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    var usuarioActual = mutableStateOf<String?>(null)
-
-    fun login(
-        email: String,
-        password: String,
-        navController: NavController
-    ): Boolean {
+    fun login(email: String, password: String, navController: NavController): Boolean {
         val emailTrim = email.trim()
         val passwordTrim = password.trim()
 
         viewModelScope.launch {
-            if (!validarEmail(emailTrim)) {
-                mensaje.value = "Email no válido"
-                return@launch
-            }
-            if (!validarPassword(passwordTrim)) {
-                mensaje.value = passwordError(passwordTrim) ?: "La contraseña no cumple los requisitos"
-                return@launch
-            }
+            if (!validarEmail(emailTrim)) { mensaje.value = "Email no válido"; return@launch }
+            if (!validarPassword(passwordTrim)) { mensaje.value = passwordError(passwordTrim) ?: "La contraseña no cumple los requisitos"; return@launch }
 
             try {
                 mensaje.value = ""
 
                 val resp = RetrofitClient.apiService.login(
-                    LoginRequest(
-                        correo = emailTrim,
-                        password = passwordTrim
-                    )
+                    LoginRequest(correo = emailTrim, password = passwordTrim)
                 )
 
                 RetrofitClient.setToken(resp.token)
-
                 usuarioActual.value = resp.correo
 
                 mensaje.value = when (resp.rol) {
@@ -260,7 +227,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 when (resp.rol) {
-                    "ADMIN" -> navController.navigate("admin")
+                    "ADMIN" -> navController.navigate("admin") {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
                     else -> navController.navigate("home/${resp.correo}")
                 }
 
@@ -270,7 +240,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 if (esAdmin(emailTrim, passwordTrim)) {
                     usuarioActual.value = emailTrim
                     mensaje.value = "Acceso concedido a usuario administrador (local)"
-                    navController.navigate("admin")
+                    navController.navigate("admin") {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 } else if (FakeDatabase.login(emailTrim, passwordTrim)) {
                     usuarioActual.value = emailTrim
                     mensaje.value = "Sesión iniciada (modo local)"
@@ -284,10 +257,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         return false
     }
 
-    private fun esAdmin(
-        email: String,
-        password: String
-    ): Boolean {
+    private fun esAdmin(email: String, password: String): Boolean {
         val context = getApplication<Application>().applicationContext
 
         val jsonString = context.assets.open("admin.json").use {
