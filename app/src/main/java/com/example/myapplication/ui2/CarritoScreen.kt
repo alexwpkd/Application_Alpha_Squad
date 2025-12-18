@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,37 +14,33 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.myapplication.ViewModel.CarritoViewModel
 import com.example.myapplication.Model.Carrito
-import com.example.myapplication.Model.Producto
-
+import com.example.myapplication.ViewModel.CarritoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarritoScreen(
     carritoViewModel: CarritoViewModel,
-    navController: NavController,
+    navController: NavController
 ) {
     val items by carritoViewModel.carrito.collectAsState()
     val total by carritoViewModel.total.collectAsState()
     var mostrarDialogo by remember { mutableStateOf(false) }
     var mostrarError by remember { mutableStateOf(false) }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text("Carrito")
-                },
+                title = { Text("Carrito") },
                 navigationIcon = {
                     TextButton(
                         onClick = {
-                            navController.navigate("home/{email}")
+                            navController.navigate("home") {
+                                launchSingleTop = true
+                                popUpTo("home") { inclusive = false }
+                            }
                         }
-                    ) {
-                        Text("Volver")
-                    }
+                    ) { Text("Volver") }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
             )
@@ -124,8 +118,6 @@ fun CarritoScreen(
                     ) {
                         Text("Finalizar compra")
                     }
-
-
                 }
             }
         }
@@ -179,10 +171,13 @@ fun CarritoScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        carritoViewModel.realizarCompra(1L) { exito, mensaje ->
+                        carritoViewModel.realizarCompra(1L) { exito, _ ->
                             if (exito) {
                                 mostrarDialogo = false
-                                navController.navigate("home/{email}")
+                                navController.navigate("home") {
+                                    launchSingleTop = true
+                                    popUpTo("home") { inclusive = false }
+                                }
                             }
                         }
                     },
@@ -201,8 +196,6 @@ fun CarritoScreen(
             }
         )
     }
-
-
 }
 
 @Composable
@@ -237,17 +230,13 @@ private fun CarritoItemRow(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(item.producto.nombre, style = MaterialTheme.typography.titleMedium)
                 Text("Precio: $${item.producto.precio}")
                 Text("Subtotal: $${item.producto.precio * item.cantidad}")
             }
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onDecrementar) {
                         Icon(

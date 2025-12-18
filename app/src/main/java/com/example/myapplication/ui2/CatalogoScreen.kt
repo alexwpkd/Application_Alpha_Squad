@@ -7,8 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,23 +29,39 @@ fun CatalogoScreen(
     carritoViewModel: CarritoViewModel
 ) {
     val context = LocalContext.current
-    val producto by catalogViewModel.productos.collectAsState()
+    val productos by catalogViewModel.productos.collectAsState()
     val loading by catalogViewModel.loading.collectAsState()
 
     LaunchedEffect(Unit) {
         catalogViewModel.cargarProductos(context)
     }
 
-    Scaffold(topBar = {
-        CenterAlignedTopAppBar(
-            title = { Text("Catalogo de productos\nAlpha Squad") },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
-        )
-
-        TextButton(onClick = { navController.navigate("home/{email}") }) {
-            Text("Volver")
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Catálogo de productos\nAlpha Squad") },
+                navigationIcon = {
+                    TextButton(
+                        onClick = {
+                            navController.navigate("home") {
+                                launchSingleTop = true
+                                popUpTo("home") { inclusive = false }
+                            }
+                        }
+                    ) { Text("Volver") }
+                },
+                actions = {
+                    TextButton(onClick = { navController.navigate("tactica") }) {
+                        Text("Compra táctica")
+                    }
+                    TextButton(onClick = { navController.navigate("carrito") }) {
+                        Text("Carrito")
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+            )
         }
-    }) { padding ->
+    ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             if (loading) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -59,7 +73,7 @@ fun CatalogoScreen(
                     contentPadding = PaddingValues(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(producto, key = { it.id }) { producto ->
+                    items(productos, key = { it.id }) { producto ->
                         ProductoCard(
                             producto = producto,
                             onDetalle = { navController.navigate("detalle/${producto.id}") }
@@ -87,7 +101,6 @@ fun ProductoCard(
             Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             val painter = if (!producto.imagenUrl.isNullOrBlank()) {
                 rememberAsyncImagePainter(producto.imagenUrl)
             } else {
@@ -102,10 +115,13 @@ fun ProductoCard(
             )
 
             Spacer(Modifier.width(12.dp))
+
             Column(Modifier.weight(1f)) {
                 Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
                 Text("Precio: $${producto.precio}", style = MaterialTheme.typography.bodyMedium)
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = onDetalle) {
                         Text("Ver")

@@ -1,35 +1,34 @@
 package com.example.myapplication
-import android.annotation.SuppressLint
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.navigation.compose.*
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.myapplication.ViewModel.AuthViewModel
-import com.example.myapplication.View.*
-import com.example.myapplication.ViewModel.CatalogoViewModel
-import com.example.myapplication.ui2.CatalogoScreen
-import com.example.myapplication.ui2.CarritoScreen
-
-//
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.ui.theme.MyApplicationTheme
-//
-import androidx.navigation.NavType
-import com.example.myapplication.ui2.DetalleProductoScreen
 import androidx.navigation.navArgument
+import com.example.myapplication.View.*
+import com.example.myapplication.ViewModel.AuthViewModel
+import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ViewModel.CarritoViewModel
+import com.example.myapplication.ViewModel.CompraTacticaViewModel
+import com.example.myapplication.ui.theme.MyApplicationTheme
+import com.example.myapplication.ui2.CarritoScreen
+import com.example.myapplication.ui2.CatalogoScreen
+import com.example.myapplication.ui2.CompraTacticaScreen
+import com.example.myapplication.ui2.DetalleProductoScreen
 
 class MainActivity : ComponentActivity() {
-    @SuppressLint("ViewModelConstructorInComposable")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             MyApplicationTheme {
                 Surface(
@@ -37,20 +36,24 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    val viewModel: AuthViewModel = viewModel()
+
+                    val authViewModel: AuthViewModel = viewModel()
                     val catalogoViewModel: CatalogoViewModel = viewModel()
-                    val catalogViewModel = CatalogoViewModel()
                     val carritoViewModel: CarritoViewModel = viewModel()
 
-
-                    NavHost(navController, startDestination = "login") {
+                    NavHost(navController = navController, startDestination = "login") {
 
                         composable("register") {
-                            RegisterScreen(navController, viewModel)
+                            RegisterScreen(navController, authViewModel)
                         }
 
                         composable("login") {
-                            LoginScreen(navController, viewModel)
+                            LoginScreen(navController, authViewModel)
+                        }
+
+                        // ✅ Home sin email (para volver sin romper ruta)
+                        composable("home") {
+                            HomeScreen(navController, email = null)
                         }
 
                         composable("home/{email}") { backStack ->
@@ -63,7 +66,18 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("catalogue") {
-                            CatalogoScreen(navController, catalogViewModel, carritoViewModel)
+                            CatalogoScreen(navController, catalogoViewModel, carritoViewModel)
+                        }
+
+                        // ✅ NUEVO: Compra táctica
+                        composable("tactica") {
+                            val tacticaViewModel: CompraTacticaViewModel = viewModel()
+                            CompraTacticaScreen(
+                                navController = navController,
+                                catalogoViewModel = catalogoViewModel,
+                                carritoViewModel = carritoViewModel,
+                                tacticaViewModel = tacticaViewModel
+                            )
                         }
 
                         composable("admin") {
@@ -71,22 +85,21 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("adminCatalogue") {
-                            AdminCatalogScreen(navController, catalogViewModel)
+                            AdminCatalogScreen(navController, catalogoViewModel)
                         }
 
                         composable("adminProductAdd") {
                             administradorAgregarProducto(navController)
                         }
+
                         composable(
                             route = "detalle/{productoId}",
                             arguments = listOf(navArgument("productoId") { type = NavType.IntType })
                         ) { backStackEntry ->
                             val id = backStackEntry.arguments?.getInt("productoId") ?: -1
-                            DetalleProductoScreen(productoId = id, viewModel = catalogoViewModel, carritoViewModel = carritoViewModel, navController = navController)
-
                             DetalleProductoScreen(
                                 productoId = id,
-                                viewModel = catalogViewModel,
+                                viewModel = catalogoViewModel,
                                 carritoViewModel = carritoViewModel,
                                 navController = navController
                             )
@@ -99,7 +112,7 @@ class MainActivity : ComponentActivity() {
                             val productoId = backStackEntry.arguments?.getLong("productoId") ?: 0L
                             administradorEditarProducto(
                                 navController = navController,
-                                catalogViewModel = catalogViewModel,
+                                catalogViewModel = catalogoViewModel,
                                 productoId = productoId
                             )
                         }
@@ -111,12 +124,10 @@ class MainActivity : ComponentActivity() {
                             val productoId = backStackEntry.arguments?.getLong("productoId") ?: 0L
                             AdminDetalleProductoScreen(
                                 navController = navController,
-                                catalogViewModel = catalogViewModel,
+                                catalogViewModel = catalogoViewModel,
                                 productoId = productoId
                             )
                         }
-
-
                     }
                 }
             }

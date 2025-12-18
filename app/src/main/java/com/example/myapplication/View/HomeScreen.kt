@@ -6,11 +6,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -99,7 +98,7 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     HomeButton(
-                        text = "Catalogo",
+                        text = "Catálogo",
                         icon = Icons.Default.Storefront,
                         color = MaterialTheme.colorScheme.primaryContainer
                     ) {
@@ -108,10 +107,21 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // ✅ NUEVO: Compra táctica
+                    HomeButton(
+                        text = "Compra táctica",
+                        icon = Icons.Default.FlashOn,
+                        color = MaterialTheme.colorScheme.secondaryContainer
+                    ) {
+                        navController.navigate("tactica")
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     HomeButton(
                         text = "Carrito",
                         icon = Icons.Default.AddShoppingCart,
-                        color = MaterialTheme.colorScheme.secondaryContainer
+                        color = MaterialTheme.colorScheme.tertiaryContainer
                     ) {
                         navController.navigate("carrito")
                     }
@@ -133,7 +143,7 @@ fun HomeScreen(
                     HomeButton(
                         text = "Sign Out",
                         icon = Icons.Default.ExitToApp,
-                        color = MaterialTheme.colorScheme.tertiaryContainer
+                        color = MaterialTheme.colorScheme.errorContainer
                     ) {
                         navController.navigate("login")
                     }

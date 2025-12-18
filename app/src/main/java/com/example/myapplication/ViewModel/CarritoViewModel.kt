@@ -21,15 +21,23 @@ class CarritoViewModel : ViewModel() {
         _total.value = _carrito.value.sumOf { it.producto.precio * it.cantidad }
     }
 
+    // Compatibilidad con tu código actual
     fun agregarAlCarrito(producto: Producto) {
+        agregarAlCarrito(producto, 1)
+    }
+
+    // Nuevo: permite agregar N unidades (ideal para compra táctica)
+    fun agregarAlCarrito(producto: Producto, cantidad: Int) {
+        if (cantidad <= 0) return
+
         val listaActual = _carrito.value.toMutableList()
         val index = listaActual.indexOfFirst { it.producto.id == producto.id }
 
         if (index >= 0) {
             val item = listaActual[index]
-            listaActual[index] = item.copy(cantidad = item.cantidad + 1)
+            listaActual[index] = item.copy(cantidad = item.cantidad + cantidad)
         } else {
-            listaActual.add(Carrito(producto, 1))
+            listaActual.add(Carrito(producto, cantidad))
         }
 
         _carrito.value = listaActual
