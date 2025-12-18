@@ -1,6 +1,9 @@
 package com.example.myapplication.View
 
-import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,18 +15,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.remote.ProductoCreateRequest
 import com.example.myapplication.remote.RetrofitClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,42 +38,37 @@ fun administradorEditarProducto(
 ) {
     var sku by remember { mutableStateOf(TextFieldValue("")) }
     var nombre by remember { mutableStateOf(TextFieldValue("")) }
-    var categoria by remember { mutableStateOf(TextFieldValue("")) }
     var precio by remember { mutableStateOf(TextFieldValue("")) }
     var stock by remember { mutableStateOf(TextFieldValue("")) }
-    var imagenClave by remember { mutableStateOf(TextFieldValue("")) }
     var descripcion by remember { mutableStateOf(TextFieldValue("")) }
-
-    val opciones = listOf(
-        "fusil",
-        "subfusil",
-        "pistola",
-        "bbs",
-        "co2",
-        "optica",
-        "agarres",
-        "correas",
-        "iluminacion"
-    )
-
-    val categorias = listOf(
-        "arma_primaria",
-        "arma_secundaria",
-        "municion",
-        "accesorios"
-    )
-
-    var expanded by remember { mutableStateOf(false) }
-    var selectedText by remember { mutableStateOf("") }
 
     var categoriaExpanded by remember { mutableStateOf(false) }
     var categoriaSeleccionada by remember { mutableStateOf("") }
 
+    var subcategoriaExpanded by remember { mutableStateOf(false) }
+    var subcategoriaSeleccionada by remember { mutableStateOf("") }
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val opciones = listOf(
+        "fusil", "subfusil", "pistola", "bbs", "co2",
+        "optica", "agarres", "correas", "iluminacion"
+    )
+
+    val categorias = listOf(
+        "arma_primaria", "arma_secundaria", "municion", "accesorios"
+    )
+
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     var loading by remember { mutableStateOf(false) }
-
     val context = LocalContext.current
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        imageUri = uri
+    }
 
     LaunchedEffect(productoId) {
         loading = true
@@ -80,9 +79,9 @@ fun administradorEditarProducto(
             precio = TextFieldValue(producto.precio.toString())
             stock = TextFieldValue(producto.stock.toString())
             descripcion = TextFieldValue(producto.descripcion)
-            imagenClave = TextFieldValue(producto.imagen ?: "")
             categoriaSeleccionada = producto.categoria
-            selectedText = producto.subcategoria
+            subcategoriaSeleccionada = producto.subcategoria
+            imageUri = producto.imagen?.let { Uri.parse(it) }
         } catch (e: Exception) {
             snackbarHostState.showSnackbar("Error cargando producto: ${e.message}")
         } finally {
@@ -94,11 +93,23 @@ fun administradorEditarProducto(
         sku.text.isNotBlank() &&
                 nombre.text.isNotBlank() &&
                 categoriaSeleccionada.isNotBlank() &&
+                subcategoriaSeleccionada.isNotBlank() &&
                 precio.text.toIntOrNull()?.let { it >= 0 } == true &&
                 stock.text.toIntOrNull()?.let { it >= 0 } == true &&
-                imagenClave.text.isNotBlank() &&
                 descripcion.text.isNotBlank() &&
-                selectedText.isNotBlank()
+                imageUri != null
+
+    val fieldColors = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = Color(0xFF0E2F3A),
+        unfocusedContainerColor = Color(0xFF0E2F3A),
+        disabledContainerColor = Color(0xFF0E2F3A),
+        focusedBorderColor = Color(0xFF6650A4),
+        unfocusedBorderColor = Color(0xFF6650A4),
+        focusedTextColor = Color(0xFFEDEDED),
+        unfocusedTextColor = Color(0xFFEDEDED),
+        focusedLabelColor = Color(0xFFEDEDED),
+        unfocusedLabelColor = Color(0xFFEDEDED)
+    )
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -130,7 +141,6 @@ fun administradorEditarProducto(
                     .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 OutlinedButton(
                     onClick = { navController.navigate("admin") },
                     colors = ButtonDefaults.outlinedButtonColors(
@@ -155,29 +165,83 @@ fun administradorEditarProducto(
                     value = sku,
                     onValueChange = { sku = it },
                     label = { Text("SKU") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF0E2F3A),
-                        unfocusedContainerColor = Color(0xFF0E2F3A),
-                        focusedBorderColor = Color(0xFF6650A4),
-                        unfocusedBorderColor = Color(0xFF6650A4),
-                        focusedTextColor = Color(0xFFEDEDED),
-                        unfocusedTextColor = Color(0xFFEDEDED)
-                    ),
+                    colors = fieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") },
+                    colors = fieldColors,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                ExposedDropdownMenuBox(
+                    expanded = categoriaExpanded,
+                    onExpandedChange = { categoriaExpanded = !categoriaExpanded }
+                ) {
+                    OutlinedTextField(
+                        value = categoriaSeleccionada,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Categoría") },
+                        colors = fieldColors,
+                        modifier = Modifier.menuAnchor().fillMaxWidth(),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(categoriaExpanded) }
+                    )
+                    ExposedDropdownMenu(
+                        expanded = categoriaExpanded,
+                        onDismissRequest = { categoriaExpanded = false },
+                        containerColor = Color(0xFF0E2F3A)
+                    ) {
+                        categorias.forEach {
+                            DropdownMenuItem(
+                                text = { Text(it, color = Color(0xFFEDEDED)) },
+                                onClick = {
+                                    categoriaSeleccionada = it
+                                    categoriaExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                ExposedDropdownMenuBox(
+                    expanded = subcategoriaExpanded,
+                    onExpandedChange = { subcategoriaExpanded = !subcategoriaExpanded }
+                ) {
+                    OutlinedTextField(
+                        value = subcategoriaSeleccionada,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Subcategoría") },
+                        colors = fieldColors,
+                        modifier = Modifier.menuAnchor().fillMaxWidth(),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(subcategoriaExpanded) }
+                    )
+                    ExposedDropdownMenu(
+                        expanded = subcategoriaExpanded,
+                        onDismissRequest = { subcategoriaExpanded = false },
+                        containerColor = Color(0xFF0E2F3A)
+                    ) {
+                        opciones.forEach {
+                            DropdownMenuItem(
+                                text = { Text(it, color = Color(0xFFEDEDED)) },
+                                onClick = {
+                                    subcategoriaSeleccionada = it
+                                    subcategoriaExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
 
                 OutlinedTextField(
                     value = precio,
                     onValueChange = { precio = it },
                     label = { Text("Precio (CLP)") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF0E2F3A),
-                        unfocusedContainerColor = Color(0xFF0E2F3A),
-                        focusedBorderColor = Color(0xFF6650A4),
-                        unfocusedBorderColor = Color(0xFF6650A4),
-                        focusedTextColor = Color(0xFFEDEDED),
-                        unfocusedTextColor = Color(0xFFEDEDED)
-                    ),
+                    colors = fieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -185,29 +249,7 @@ fun administradorEditarProducto(
                     value = stock,
                     onValueChange = { stock = it },
                     label = { Text("Stock disponible") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF0E2F3A),
-                        unfocusedContainerColor = Color(0xFF0E2F3A),
-                        focusedBorderColor = Color(0xFF6650A4),
-                        unfocusedBorderColor = Color(0xFF6650A4),
-                        focusedTextColor = Color(0xFFEDEDED),
-                        unfocusedTextColor = Color(0xFFEDEDED)
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = imagenClave,
-                    onValueChange = { imagenClave = it },
-                    label = { Text("URL de imagen") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF0E2F3A),
-                        unfocusedContainerColor = Color(0xFF0E2F3A),
-                        focusedBorderColor = Color(0xFF6650A4),
-                        unfocusedBorderColor = Color(0xFF6650A4),
-                        focusedTextColor = Color(0xFFEDEDED),
-                        unfocusedTextColor = Color(0xFFEDEDED)
-                    ),
+                    colors = fieldColors,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -215,17 +257,41 @@ fun administradorEditarProducto(
                     value = descripcion,
                     onValueChange = { descripcion = it },
                     label = { Text("Descripción") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF0E2F3A),
-                        unfocusedContainerColor = Color(0xFF0E2F3A),
-                        focusedBorderColor = Color(0xFF6650A4),
-                        unfocusedBorderColor = Color(0xFF6650A4),
-                        focusedTextColor = Color(0xFFEDEDED),
-                        unfocusedTextColor = Color(0xFFEDEDED)
-                    ),
+                    colors = fieldColors,
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 3
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "Imagen del producto",
+                    color = Color(0xFFEDEDED),
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedButton(
+                    onClick = { galleryLauncher.launch("image/*") },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFFEDEDED)
+                    )
+                ) {
+                    Text("Seleccionar imagen")
+                }
+
+                imageUri?.let {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Image(
+                        painter = rememberAsyncImagePainter(it),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -249,9 +315,9 @@ fun administradorEditarProducto(
                                         sku = sku.text.trim(),
                                         stock = stock.text.toInt(),
                                         categoria = categoriaSeleccionada.trim(),
-                                        subcategoria = selectedText.trim(),
+                                        subcategoria = subcategoriaSeleccionada.trim(),
                                         descripcion = descripcion.text.trim(),
-                                        imagenUrl = imagenClave.text.trim()
+                                        imagenUrl = imageUri.toString()
                                     )
                                 )
                                 snackbarHostState.showSnackbar("Producto actualizado correctamente")
