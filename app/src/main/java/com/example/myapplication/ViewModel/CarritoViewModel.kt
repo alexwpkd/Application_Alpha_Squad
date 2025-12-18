@@ -14,6 +14,7 @@ class CarritoViewModel : ViewModel() {
     private val _carrito = MutableStateFlow<List<Carrito>>(emptyList())
     val carrito: StateFlow<List<Carrito>> = _carrito
 
+    val items: StateFlow<List<Carrito>> get() = _carrito
     private val _total = MutableStateFlow(0)
     val total: StateFlow<Int> = _total
 
