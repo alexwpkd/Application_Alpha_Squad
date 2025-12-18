@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,6 +19,7 @@ import com.example.myapplication.Model.Producto
 import com.example.myapplication.ViewModel.CatalogoViewModel
 import com.example.myapplication.ViewModel.CarritoViewModel
 import com.example.myapplication.ViewModel.CompraTacticaViewModel
+import com.example.myapplication.ui.theme.ProductCard_Color
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +41,7 @@ fun CompraTacticaScreen(
     val loading by catalogoViewModel.loading.collectAsState()
     val seleccion by tacticaViewModel.seleccion.collectAsState()
 
-    // Tabs por categoria (tipo menú rápido)
+    // Tabs por categoria
     val categorias = remember(productos) {
         listOf("Todo") + productos.map { it.categoria }.distinct()
     }
@@ -159,7 +161,13 @@ private fun CompraTacticaItem(
 ) {
     val disponible = producto.enStock && producto.stock > 0
 
-    Card(modifier = Modifier.fillMaxWidth()) {
+    // ✅ MISMO LOOK QUE CATÁLOGO
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = ProductCard_Color)
+    ) {
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -198,7 +206,10 @@ private fun CompraTacticaItem(
 
                 Text(cantidadSeleccionada.toString(), modifier = Modifier.width(24.dp))
 
-                IconButton(onClick = onMas, enabled = disponible && cantidadSeleccionada < producto.stock) {
+                IconButton(
+                    onClick = onMas,
+                    enabled = disponible && cantidadSeleccionada < producto.stock
+                ) {
                     Icon(
                         painter = painterResource(id = android.R.drawable.ic_input_add),
                         contentDescription = "Más"
