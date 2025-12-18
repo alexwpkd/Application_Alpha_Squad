@@ -22,8 +22,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     var mensaje = mutableStateOf("")
     private val gson by lazy { GsonBuilder().setPrettyPrinting().create() }
 
-    // ================== VALIDACIONES ==================
-
     private fun validarRut(rut: String): Boolean {
         val clean = rut.replace(".", "").replace("-", "").replace(" ", "").uppercase()
         if (clean.length < 2) return false
@@ -88,8 +86,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun noVacio(texto: String): Boolean = texto.trim().isNotEmpty()
 
-    // ================== ARCHIVO JSON LOCAL DE USUARIOS (opcional, lo dejo por si lo usas) ==================
-
     private fun usuariosDir(): File {
         val dir = File(getApplication<Application>().filesDir, "usuarios")
         if (!dir.exists()) dir.mkdirs()
@@ -131,12 +127,12 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         guardarUsuariosAArchivo(lista)
     }
 
-    // ================== REGISTRO (AHORA USA BACKEND) ==================
-
     fun registrar(
         nombre: String,
         apellidos: String,
         rut: String,
+        regionSeleccionada: Boolean,
+        comunaSeleccionada: Boolean,
         direccion: String,
         email: String,
         password: String,
@@ -163,6 +159,16 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         val rutFormateado = formatearRut(rutTrim)
+
+        if (!regionSeleccionada) {
+            mensaje.value = "Debes seleccionar una región"
+            return
+        }
+
+        if (!comunaSeleccionada) {
+            mensaje.value = "Debes seleccionar una comuna"
+            return
+        }
 
         if (!noVacio(direccionTrim)) {
             mensaje.value = "La dirección es obligatoria"
@@ -194,7 +200,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
                 val resp = RetrofitClient.apiService.registrarCliente(req)
 
-                // opcional: también lo guardas localmente si quieres
                 val usuarioRegistro = Usuario(
                     nombreTrim,
                     rutFormateado,
@@ -212,8 +217,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-
-    // ================== LOGIN (YA USA BACKEND) ==================
 
     var usuarioActual = mutableStateOf<String?>(null)
 
@@ -280,8 +283,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
         return false
     }
-
-    // ================== ADMIN LOCAL (JSON EN assets) ==================
 
     private fun esAdmin(
         email: String,

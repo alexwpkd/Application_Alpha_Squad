@@ -4,10 +4,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -17,15 +16,30 @@ import com.example.myapplication.ViewModel.AuthViewModel
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val fieldColors = OutlinedTextFieldDefaults.colors(
+        focusedContainerColor = Color(0xFF0E2F3A),
+        unfocusedContainerColor = Color(0xFF0E2F3A),
+        disabledContainerColor = Color(0xFF0E2F3A),
+
+        focusedBorderColor = Color(0xFF6650A4),
+        unfocusedBorderColor = Color(0xFF6650A4),
+
+        focusedTextColor = Color(0xFFEDEDED),
+        unfocusedTextColor = Color(0xFFEDEDED),
+
+        focusedLabelColor = Color(0xFFEDEDED),
+        unfocusedLabelColor = Color(0xFFEDEDED)
+    )
 
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(
-
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(32.dp),
@@ -35,22 +49,24 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Logo de Alpha Squad",
-                modifier = Modifier
-                    .size(150.dp)
+                modifier = Modifier.size(150.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-
             Text(
                 "~ Alpha Squad ~",
                 style = MaterialTheme.typography.titleLarge,
+                color = Color(0xFFEDEDED)
             )
 
             Spacer(modifier = Modifier.height(40.dp))
 
-
-            Text("Inicio de Sesión", style = MaterialTheme.typography.headlineSmall)
+            Text(
+                "Inicio de Sesión",
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color(0xFFEDEDED)
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -58,6 +74,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 value = email,
                 onValueChange = { email = it },
                 label = { Text("Email") },
+                colors = fieldColors,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -68,6 +85,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 onValueChange = { password = it },
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
+                colors = fieldColors,
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -76,10 +94,11 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             Button(
                 onClick = {
                     viewModel.login(email, password, navController)
-                    val mensaje = viewModel.mensaje.value
-                    if (mensaje.contains("Administrador") || mensaje.contains("Bienvenido")) {
-                    }
                 },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF6650A4),
+                    contentColor = Color(0xFFEDEDED)
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Entrar")
@@ -89,19 +108,27 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                 Text(
                     text = viewModel.mensaje.value,
                     modifier = Modifier.padding(top = 10.dp),
-                    color = if (viewModel.mensaje.value.contains("Error")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                    color = if (viewModel.mensaje.value.contains("Error"))
+                        MaterialTheme.colorScheme.error
+                    else
+                        Color(0xFFEDEDED)
                 )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(onClick = { navController.navigate("register") }) {
-                Text("¿No tienes cuenta? ¡Regístrate!")
+                Text(
+                    "¿No tienes cuenta? ¡Regístrate!",
+                    color = Color(0xFFEDEDED)
+                )
             }
 
-
             TextButton(onClick = { navController.navigate("home/test@example.com") }) {
-                Text("Entrar a home (Test)")
+                Text(
+                    "Entrar a home (Test)",
+                    color = Color(0xFFEDEDED)
+                )
             }
         }
     }

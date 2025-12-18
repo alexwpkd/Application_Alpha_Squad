@@ -40,7 +40,6 @@ fun HomeScreen(
         color = MaterialTheme.colorScheme.background
     ) {
         if (welcome) {
-            // --- Pantalla de Carga Inicial (sin cambios) ---
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -71,29 +70,25 @@ fun HomeScreen(
                 }
             }
         } else {
-            // --- Pantalla del Menú Principal (MODIFICADA) ---
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(20.dp)
             ) {
-                // El contenido principal ahora está en un solo Column centrado
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.Center), // Alinea toda la columna en el centro
+                        .align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center // Centra los elementos verticalmente dentro del espacio que ocupan
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    // 1. Logo (más grande)
                     Image(
                         painter = painterResource(id = R.drawable.logo),
                         contentDescription = "Logo de Alpha Squad",
-                        modifier = Modifier.size(170.dp) // Aumentamos el tamaño
+                        modifier = Modifier.size(170.dp)
                     )
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    // 2. Título
                     Text(
                         text = "Menú Principal",
                         style = MaterialTheme.typography.headlineMedium.copy(
@@ -103,7 +98,6 @@ fun HomeScreen(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // 3. Botones de acción
                     HomeButton(
                         text = "Catalogo",
                         icon = Icons.Default.Storefront,
@@ -123,7 +117,6 @@ fun HomeScreen(
                     }
                 }
 
-                // Botón de Sign Out (se mantiene abajo)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
