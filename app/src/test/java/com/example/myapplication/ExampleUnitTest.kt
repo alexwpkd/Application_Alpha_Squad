@@ -21,7 +21,7 @@ class ExampleUnitTest {
         return AuthViewModel(app)
     }
 
-    // ================== TESTS DE REGISTRO ==================
+    // TESTS DE REGISTRO
 
     @Test
     fun registrar_conRutInvalido_retornaError() {
@@ -31,6 +31,8 @@ class ExampleUnitTest {
             nombre = "Juan",
             apellidos = "Pérez",
             rut = "123",
+            regionSeleccionada = true,
+            comunaSeleccionada = true,
             direccion = "Calle Falsa 123",
             email = "juan@test.com",
             password = "Abc1"
@@ -47,6 +49,8 @@ class ExampleUnitTest {
             nombre = "Juan",
             apellidos = "Pérez",
             rut = "12.345.678-5",
+            regionSeleccionada = true,
+            comunaSeleccionada = true,
             direccion = "Calle Falsa 123",
             email = "correo_invalido",
             password = "Abc1"
@@ -63,6 +67,8 @@ class ExampleUnitTest {
             nombre = "Juan",
             apellidos = "Pérez",
             rut = "12.345.678-5",
+            regionSeleccionada = true,
+            comunaSeleccionada = true,
             direccion = "Calle Falsa 123",
             email = "test@test.com",
             password = "abc"
@@ -79,6 +85,8 @@ class ExampleUnitTest {
             nombre = "",
             apellidos = "Pérez",
             rut = "12.345.678-5",
+            regionSeleccionada = true,
+            comunaSeleccionada = true,
             direccion = "Calle Falsa 123",
             email = "test@test.com",
             password = "Abc1"
@@ -95,6 +103,8 @@ class ExampleUnitTest {
             nombre = "Juan",
             apellidos = "Pérez",
             rut = "12.345.678-5",
+            regionSeleccionada = true,
+            comunaSeleccionada = true,
             direccion = "",
             email = "test@test.com",
             password = "Abc1"
@@ -111,6 +121,8 @@ class ExampleUnitTest {
             nombre = "Juan",
             apellidos = "Pérez",
             rut = "12.345.678-5",
+            regionSeleccionada = true,
+            comunaSeleccionada = true,
             direccion = "Calle Falsa 123",
             email = "test@test.com",
             password = "abcd"
@@ -127,6 +139,8 @@ class ExampleUnitTest {
             nombre = "Juan",
             apellidos = "Pérez",
             rut = "12.345.678-5",
+            regionSeleccionada = true,
+            comunaSeleccionada = true,
             direccion = "Calle Falsa 123",
             email = "test@test.com",
             password = "ABCD"
@@ -135,7 +149,7 @@ class ExampleUnitTest {
         assertTrue(vm.mensaje.value.contains("minúscula"))
     }
 
-    // ================== TESTS DE CARRITO ==================
+    // TESTS DE CARRITO
 
     @Test
     fun agregarAlCarrito_productoAgregado() {
