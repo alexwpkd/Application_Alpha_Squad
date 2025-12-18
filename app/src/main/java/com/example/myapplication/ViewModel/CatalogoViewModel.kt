@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.Model.Producto
+import com.example.myapplication.remote.RetrofitClient
 import com.example.myapplication.repository.ProductoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,10 +28,25 @@ class CatalogoViewModel(
             _loading.value = true
             _error.value = null
             try {
-                val list = repo.getProductos(context)
-                _productos.value = list
+                _productos.value = repo.getProductos(context)
             } catch (e: Exception) {
-                _error.value = e.message ?: "Error desconocido"
+                _error.value = e.message
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
+    fun eliminarProducto(id: Long, context: Context) {
+        viewModelScope.launch {
+            try {
+                _loading.value = true
+                repo.eliminarProducto(id)
+
+                _productos.value = repo.getProductos(context)
+
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Error al eliminar"
             } finally {
                 _loading.value = false
             }

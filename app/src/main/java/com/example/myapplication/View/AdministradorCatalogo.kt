@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
@@ -25,7 +26,7 @@ import com.example.myapplication.ui.theme.ProductCard_Color
 @Composable
 fun AdminCatalogScreen(
     navController: NavController,
-    catalogViewModel: CatalogoViewModel
+    catalogViewModel: CatalogoViewModel,
 ) {
     val context = LocalContext.current
     val productos by catalogViewModel.productos.collectAsState()
@@ -61,7 +62,11 @@ fun AdminCatalogScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(productos, key = { it.id }) { producto ->
-                        ProductoCardAdminViewOnly(producto)
+                        ProductoCardAdminViewOnly(
+                            producto = producto,
+                            navController = navController,
+                            catalogViewModel = catalogViewModel
+                        )
                     }
                 }
             }
@@ -72,40 +77,123 @@ fun AdminCatalogScreen(
 @SuppressLint("DefaultLocale")
 @Composable
 fun ProductoCardAdminViewOnly(
-    producto: Producto
+    producto: Producto,
+    navController: NavController,
+    catalogViewModel: CatalogoViewModel
 ) {
+    val context = LocalContext.current
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = ProductCard_Color)
     ) {
-        Row(
-            Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column(Modifier.padding(12.dp)) {
 
-            val painter = if (!producto.imagenUrl.isNullOrBlank()) {
-                rememberAsyncImagePainter(producto.imagenUrl)
-            } else {
-                painterResource(id = producto.imagenClave)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                val painter = if (!producto.imagenUrl.isNullOrBlank()) {
+                    rememberAsyncImagePainter(producto.imagenUrl)
+                } else {
+                    painterResource(id = producto.imagenClave)
+                }
+
+                Image(
+                    painter = painter,
+                    contentDescription = producto.nombre,
+                    modifier = Modifier.size(80.dp),
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(Modifier.width(12.dp))
+
+                Column(Modifier.weight(1f)) {
+                    Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
+                    Text("Precio: $${producto.precio}")
+                    Text(producto.descripcion, maxLines = 2)
+                }
             }
 
-            Image(
-                painter = painter,
-                contentDescription = producto.nombre,
-                modifier = Modifier.size(80.dp),
-                contentScale = ContentScale.Crop
-            )
+            Spacer(Modifier.height(8.dp))
 
-            Spacer(Modifier.width(12.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(
+                    onClick = {
+                        navController.navigate("admin/detalle/${producto.id}")
+                    }
+                ) {
+                    Text("Ver detalle")
+                }
 
-            Column(Modifier.weight(1f)) {
-                Text(producto.nombre, style = MaterialTheme.typography.titleMedium)
-                Text("Precio: $${producto.precio}", style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(producto.descripcion)
+                TextButton(
+                    onClick = {
+                        navController.navigate("admin/editar/${producto.id}")
+                    }
+                ) {
+                    Text("Editar")
+                }
+
+                TextButton(
+                    onClick = { showDeleteDialog = true },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Eliminar")
+                }
             }
         }
     }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            containerColor = Color(0xFF0E2F3A),
+            title = {
+                Text(
+                    "Eliminar producto",
+                    color = Color(0xFFEDEDED),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            },
+            text = {
+                Text(
+                    "¿Estás seguro que deseas eliminar \"${producto.nombre}\"?",
+                    color = Color(0xFFEDEDED)
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        catalogViewModel.eliminarProducto(
+                            id = producto.id.toLong(),
+                            context = context
+                        )
+                        showDeleteDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color(0xFFFF5C5C)
+                    )
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialog = false },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color(0xFFEDEDED)
+                    )
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }
+

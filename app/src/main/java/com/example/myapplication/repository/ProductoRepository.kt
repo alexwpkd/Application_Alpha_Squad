@@ -7,6 +7,10 @@ import com.example.myapplication.remote.RetrofitClient
 
 class ProductoRepository {
 
+    suspend fun eliminarProducto(id: Long) {
+        RetrofitClient.apiService.eliminarProducto(id)
+    }
+
     suspend fun getProductos(context: Context): List<Producto> {
         return try {
             val productosDto: List<ProductoDto> = RetrofitClient.apiService.getProductos()
@@ -21,10 +25,8 @@ class ProductoRepository {
                     precio = dto.precio,
                     enStock = dto.enStock,
                     stock = dto.stock,
-                    // 👇 Drawable genérico como fallback si no quieres usar assets
                     imagenClave = android.R.drawable.ic_menu_report_image,
                     descripcion = dto.descripcion,
-                    // 👇 AQUÍ usamos la URL que viene del backend
                     imagenUrl = dto.imagen
                 )
             }

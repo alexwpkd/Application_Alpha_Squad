@@ -26,7 +26,6 @@ import com.example.myapplication.ui2.DetalleProductoScreen
 import androidx.navigation.navArgument
 import com.example.myapplication.ViewModel.CarritoViewModel
 
-
 class MainActivity : ComponentActivity() {
     @SuppressLint("ViewModelConstructorInComposable")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,6 +91,32 @@ class MainActivity : ComponentActivity() {
                                 navController = navController
                             )
                         }
+
+                        composable(
+                            route = "admin/editar/{productoId}",
+                            arguments = listOf(navArgument("productoId") { type = NavType.LongType })
+                        ) { backStackEntry ->
+                            val productoId = backStackEntry.arguments?.getLong("productoId") ?: 0L
+                            administradorEditarProducto(
+                                navController = navController,
+                                catalogViewModel = catalogViewModel,
+                                productoId = productoId
+                            )
+                        }
+
+                        composable(
+                            route = "admin/detalle/{productoId}",
+                            arguments = listOf(navArgument("productoId") { type = NavType.LongType })
+                        ) { backStackEntry ->
+                            val productoId = backStackEntry.arguments?.getLong("productoId") ?: 0L
+                            AdminDetalleProductoScreen(
+                                navController = navController,
+                                catalogViewModel = catalogViewModel,
+                                productoId = productoId
+                            )
+                        }
+
+
                     }
                 }
             }

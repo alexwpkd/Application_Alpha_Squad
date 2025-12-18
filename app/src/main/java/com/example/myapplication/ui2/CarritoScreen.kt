@@ -10,6 +10,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -132,47 +133,75 @@ fun CarritoScreen(
 
     if (mostrarError) {
         AlertDialog(
-
             onDismissRequest = { mostrarError = false },
-            title = { Text("Carrito vacío") },
-            text = { Text("No puedes realizar una compra sin productos.") },
+            containerColor = Color(0xFF0E2F3A),
+            title = {
+                Text(
+                    "Carrito vacío",
+                    color = Color(0xFFEDEDED),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            },
+            text = {
+                Text(
+                    "No puedes realizar una compra sin productos.",
+                    color = Color(0xFFEDEDED)
+                )
+            },
             confirmButton = {
-                TextButton(onClick = {
-                    mostrarError = false
-                }) {
+                TextButton(
+                    onClick = { mostrarError = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFEDEDED))
+                ) {
                     Text("Aceptar")
                 }
             }
         )
+    }
 
-        if (mostrarDialogo) {
-            AlertDialog(
-                onDismissRequest = { mostrarDialogo = false },
-                title = { Text("Confirmar compra") },
-                text = { Text("¿Deseas finalizar tu compra?") },
-                confirmButton = {
-                    TextButton(onClick = {
-
+    if (mostrarDialogo) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogo = false },
+            containerColor = Color(0xFF0E2F3A),
+            title = {
+                Text(
+                    "Confirmar compra",
+                    color = Color(0xFFEDEDED),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            },
+            text = {
+                Text(
+                    "¿Deseas finalizar tu compra?",
+                    color = Color(0xFFEDEDED)
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
                         carritoViewModel.realizarCompra(1L) { exito, mensaje ->
                             if (exito) {
                                 mostrarDialogo = false
                                 navController.navigate("home/{email}")
-                            } else {
                             }
                         }
-
-                    }) {
-                        Text("Confirmar")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { mostrarDialogo = false }) {
-                        Text("Cancelar")
-                    }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF4CAF50))
+                ) {
+                    Text("Confirmar")
                 }
-            )
-        }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { mostrarDialogo = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFEDEDED))
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
+
 
 }
 
